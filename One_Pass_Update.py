@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, Dataset
 import pandas as pd
 import numpy as np
 from sklearn.datasets import make_classification, make_regression
+from scipy.stats import zscore
 import copy
 
 class GeneratedDataset(Dataset):
@@ -61,6 +62,11 @@ def convert_to_weight(data: np.ndarray, volitility: float, d: int, total_data_si
     return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))/d) * volitility
 
 def train_model(model, dataset):
+    
+    dimension = 100
+    num_rows = len(dataset)
+    v = 0.3
+    
     #Extract the weights
     model_copy = copy.deepcopy(model)
     weights = []
@@ -75,11 +81,29 @@ def train_model(model, dataset):
         new_item = item
         for j, weight in enumerate(weights):
             new_item = np.dot(weight, new_item) 
-            print(new_item)
             result_sets[j].append(new_item)
     #Step 2: convert all of the data into zscores for their respective columns
+    converted_sets = []
+    for result in result_sets:
+        converted_sets.append(zscore(result, axis=1))
+        
+    #pop the final row and add the initial set
+    converted_sets.pop()
+    converted_sets.insert(0, zscore(dataset, axis=1))   
+    
+    #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
+        
     #Step 3: convert the zscores into delta weights
+    delta_weights = []
+    for set in converted_sets:
+        for i, row in enumerate(converted_sets):
+            calculated_weights = convert_to_weight(row, v, dimension, num_rows, i)
+            delta_weights.append(calculated_weights)
+    print(delta_weights)
     #step 4: apply the delta weights to the weight matricies of their respective layers
+    for i, deltas in enumerate(delta_weights):
+        for delta in deltas:
+            pass
 def test_accuracy(model, dataset):
     pass
 
@@ -87,4 +111,3 @@ if __name__ == "__main__":
     small_regression_problem = make_regression(n_samples = 5000, n_features=100, n_informative=10)
     temp_model = SmallRegressNetwork().to('cpu')
     train_model(temp_model, small_regression_problem[0])
-    print(convert_to_weight(np.array([1.223, 3.122, -2.117, 0.0023]), 0.5, 10, 50, 40))
