@@ -62,11 +62,11 @@ def convert_to_weight(data: np.ndarray, volitility: float, d: int, total_data_si
     """
     return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))/d) * volitility
 
-def train_model(model, dataset):
+def train_model(model, dataset: pd.DataFrame):
     
-    dimension = 100
+    dimension = 10000
     num_rows = len(dataset)
-    v = 0.01
+    v = 0.3
     
     #Extract the weights
     model_copy = copy.deepcopy(model)
@@ -77,8 +77,14 @@ def train_model(model, dataset):
             weights.append(model_copy.state_dict()[item].numpy())
         else:
             continue
+        
+    #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
+    dataset["z_answers"] = zscore(dataset['y'])
+    sorted_data = dataset.sort_values(by='z_answers')
+    x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+    
     #Step 1: move the data into the weight dimension
-    for i, item in enumerate(dataset):
+    for i, item in enumerate(x):
         new_item = item
         for j, weight in enumerate(weights):
             new_item = nn.functional.relu(torch.from_numpy(np.dot(weight, new_item))).numpy()
@@ -90,10 +96,8 @@ def train_model(model, dataset):
         
     #pop the final row and add the initial set
     converted_sets.pop()
-    converted_sets.insert(0, zscore(dataset, axis=1))   
+    converted_sets.insert(0, zscore(x, axis=1))   
     
-    #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
-        
     #Step 3: convert the zscores into delta weights
     delta_weights = []
     for set in converted_sets:
@@ -134,18 +138,23 @@ def test_accuracy(dataloader, model, loss_fn):
 
 if __name__ == "__main__":
     small_regression_problem = make_regression(n_samples = 5000, n_features=100, n_informative=10)
+    pandas_dataset = pd.DataFrame(small_regression_problem[0])
+    temp_series = pd.Series(small_regression_problem[1])
+    pandas_dataset["y"] = temp_series
     formatted_data = GeneratedDataset(small_regression_problem[0], small_regression_problem[1])
     data_loader = DataLoader(formatted_data)
     temp_model = SmallRegressNetwork().to('cpu')
-    trained_model = train_model(temp_model, small_regression_problem[0])
+    trained_model = train_model(temp_model, pandas_dataset)
+    for i in range(2):
+        trained_model = train_model(trained_model, pandas_dataset)
     test_accuracy(data_loader, temp_model, nn.MSELoss())
     test_accuracy(data_loader, trained_model, nn.MSELoss())
     window = 50
     neuron_start = 40
     column_start = 40
 
-    pre_layer = temp_model.state_dict()["l1.weight"][neuron_start:neuron_start+window]
-    post_layer = trained_model.state_dict()["l1.weight"][neuron_start:neuron_start+window]
+    pre_layer = temp_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
+    post_layer = trained_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
 
     fig = plt.figure(0)
     plt.imshow([temp[column_start:column_start+window] for temp in pre_layer], cmap='viridis', interpolation='nearest')
