@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.datasets import make_classification, make_regression
 from scipy.stats import zscore
 import copy
+import matplotlib.pyplot as plt
 
 class GeneratedDataset(Dataset):
     def __init__(self, x_data, y_data):
@@ -23,7 +24,7 @@ class SmallRegressNetwork(nn.Module):
         self.l2 = nn.Linear(128, 128)
         self.l3 = nn.Linear(128, 1)
         self.l1_l2_active = nn.ReLU()
-        self.l2_l3_active = nn.SiLU()
+        self.l2_l3_active = nn.ReLU()
 
     def forward(self, x):
         logits = self.l1_l2_active(self.l1(x.type(torch.float)))
@@ -65,7 +66,7 @@ def train_model(model, dataset):
     
     dimension = 100
     num_rows = len(dataset)
-    v = 0.3
+    v = 0.01
     
     #Extract the weights
     model_copy = copy.deepcopy(model)
@@ -80,7 +81,7 @@ def train_model(model, dataset):
     for i, item in enumerate(dataset):
         new_item = item
         for j, weight in enumerate(weights):
-            new_item = np.dot(weight, new_item) 
+            new_item = nn.functional.relu(torch.from_numpy(np.dot(weight, new_item))).numpy()
             result_sets[j].append(new_item)
     #Step 2: convert all of the data into zscores for their respective columns
     converted_sets = []
@@ -117,6 +118,7 @@ def train_model(model, dataset):
             continue
     model_copy.load_state_dict(model_copy.state_dict())
     return model_copy
+
 def test_accuracy(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
@@ -132,6 +134,38 @@ def test_accuracy(dataloader, model, loss_fn):
 
 if __name__ == "__main__":
     small_regression_problem = make_regression(n_samples = 5000, n_features=100, n_informative=10)
+    formatted_data = GeneratedDataset(small_regression_problem[0], small_regression_problem[1])
+    data_loader = DataLoader(formatted_data)
     temp_model = SmallRegressNetwork().to('cpu')
     trained_model = train_model(temp_model, small_regression_problem[0])
-    print(test_accuracy())
+    test_accuracy(data_loader, temp_model, nn.MSELoss())
+    test_accuracy(data_loader, trained_model, nn.MSELoss())
+    window = 50
+    neuron_start = 40
+    column_start = 40
+
+    pre_layer = temp_model.state_dict()["l1.weight"][neuron_start:neuron_start+window]
+    post_layer = trained_model.state_dict()["l1.weight"][neuron_start:neuron_start+window]
+
+    fig = plt.figure(0)
+    plt.imshow([temp[column_start:column_start+window] for temp in pre_layer], cmap='viridis', interpolation='nearest')
+
+    # Add a colorbar for reference
+    plt.colorbar()
+
+    # Add labels (optional)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Heatmap Pre weights ReLU-ReLU')
+
+    fig = plt.figure(1)
+    plt.imshow([temp[column_start:column_start+window] for temp in post_layer], cmap='viridis', interpolation='nearest')
+
+    # Add a colorbar for reference
+    plt.colorbar()
+
+    # Add labels (optional)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Heatmap Post weights ReLU-ReLU')
+    plt.show()
