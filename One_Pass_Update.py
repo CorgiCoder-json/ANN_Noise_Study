@@ -96,18 +96,42 @@ def train_model(model, dataset):
     #Step 3: convert the zscores into delta weights
     delta_weights = []
     for set in converted_sets:
-        for i, row in enumerate(converted_sets):
+        delta_weights_holder = []
+        for i, row in enumerate(set):
             calculated_weights = convert_to_weight(row, v, dimension, num_rows, i)
-            delta_weights.append(calculated_weights)
-    print(delta_weights)
+            delta_weights_holder.append(calculated_weights)
+        delta_weights.append(delta_weights_holder)
+        
     #step 4: apply the delta weights to the weight matricies of their respective layers
     for i, deltas in enumerate(delta_weights):
         for delta in deltas:
-            pass
-def test_accuracy(model, dataset):
-    pass
+            weights[i] += delta         
+    
+    #Step 5: reapply the weights to a new model and return
+    index = 0
+    for item in model_copy.state_dict():
+        if item[-6:] == "weight":
+            model_copy.state_dict()[item] = weights[i]
+            index += 1
+        else:
+            continue
+    model_copy.load_state_dict(model_copy.state_dict())
+    return model_copy
+def test_accuracy(dataloader, model, loss_fn):
+    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    model.eval()
+    test_loss, correct = 0, 0
+    with torch.no_grad():
+        for X, y in dataloader:
+            X, y = X.to('cpu'), y.to('cpu')
+            pred = model(X)
+            test_loss += loss_fn(pred, y.unsqueeze(1)).item()
+    test_loss /= num_batches
+    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 if __name__ == "__main__":
     small_regression_problem = make_regression(n_samples = 5000, n_features=100, n_informative=10)
     temp_model = SmallRegressNetwork().to('cpu')
-    train_model(temp_model, small_regression_problem[0])
+    trained_model = train_model(temp_model, small_regression_problem[0])
+    print(test_accuracy())
