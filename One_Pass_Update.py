@@ -51,7 +51,7 @@ def decay_constant(step: int, total_data_size: int):
 def scaled_weight(data: np.ndarray):
     return 1 / (1 + np.exp(-1 * data))
 
-def convert_to_weight(data: np.ndarray, volitility: float, d: int, total_data_size: int, step: int):
+def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int, step: int):
     """
     converts a given row of data into updateable weights
 
@@ -62,14 +62,13 @@ def convert_to_weight(data: np.ndarray, volitility: float, d: int, total_data_si
         total_data_size (int): this size of the data set that the row comes from
         step (int): the row number of the data input
     """
-    return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))/d) * volitility
+    return -1 * np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
 
 def train_model(model, dataset: pd.DataFrame):
     model.eval()
     with torch.no_grad():
-        dimension = 10000
         num_rows = len(dataset)
-        v = 0.5
+        v = 0.00007
 
         #Extract the weights
         model_copy = copy.deepcopy(model)
@@ -84,10 +83,12 @@ def train_model(model, dataset: pd.DataFrame):
                 biases.append(model_copy.state_dict()[item].numpy())
 
         #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
-        data_copy["z_answers"] = zscore(data_copy['y'])
-        data_copy["z_answers"] = data_copy['z_answers'].abs()
-        sorted_data = data_copy.sort_values(by='z_answers')
-        x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+        # data_copy["z_answers"] = zscore(data_copy['y'])
+        # data_copy["z_answers"] = data_copy['z_answers'].abs()
+        # sorted_data = data_copy.sort_values(by='z_answers')
+        # x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+        data_copy = data_copy.sample(frac=1)
+        x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
 
         #Step 1: move the data into the weight dimension
         for i, item in enumerate(x):
@@ -113,8 +114,8 @@ def train_model(model, dataset: pd.DataFrame):
             delta_weights_holder = []
             for i, row in enumerate(set):
                 if np.isnan(row.sum()):
-                    row = np.zeros(len(row))
-                calculated_weights = convert_to_weight(row, v, dimension, num_rows, i)
+                    row = 2 * np.random.random_sample((len(row))) - 1
+                calculated_weights = convert_to_weight(row, v, num_rows, i)
                 delta_weights_holder.append(calculated_weights)
             delta_weights.append(delta_weights_holder)
 
@@ -148,6 +149,7 @@ def test_accuracy(dataloader, model, loss_fn):
             test_loss += loss_fn(pred, y.unsqueeze(1)).item()
     test_loss /= num_batches
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    return test_loss
 
 if __name__ == "__main__":
     small_regression_problem = make_regression(n_samples = 5000, n_features=100, n_informative=10)
@@ -158,9 +160,13 @@ if __name__ == "__main__":
     data_loader = DataLoader(formatted_data)
     temp_model = SmallRegressNetwork().to('cpu')
     trained_model = train_model(temp_model, pandas_dataset)
-    for i in range(5):
-        print(f"MSE OF THE TRAINED MODEL AFTER TRAINIGN ROUND {i}: ")
-        test_accuracy(data_loader, trained_model, nn.MSELoss())
+    min_acc = np.inf
+    minimum_model: SmallRegressNetwork = SmallRegressNetwork()
+    for i in range(8):
+        print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
+        acc = test_accuracy(data_loader, trained_model, nn.MSELoss())
+        if acc < min_acc:
+            minimum_model = trained_model
         trained_model = train_model(trained_model, pandas_dataset)
     print("MSE OF THE NON-TRAINED MODEL: ")
     test_accuracy(data_loader, temp_model, nn.MSELoss())
@@ -169,7 +175,7 @@ if __name__ == "__main__":
     column_start = 40
 
     pre_layer = temp_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
-    post_layer = trained_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
+    post_layer = minimum_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
 
     fig = plt.figure(0)
     plt.imshow([temp[column_start:column_start+window] for temp in pre_layer], cmap='viridis', interpolation='nearest')
