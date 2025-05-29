@@ -27,8 +27,10 @@ class SmallRegressNetwork(nn.Module):
         self.l2_l3_active = nn.ReLU()
 
     def forward(self, x):
-        logits = self.l1_l2_active(self.l1(x.type(torch.float)))
-        logits = self.l2_l3_active(self.l2(logits))
+        l1_res = self.l1(x.type(torch.float))
+        logits = self.l1_l2_active(l1_res)
+        l2_res = self.l2(logits)
+        logits = self.l2_l3_active(l2_res)
         return self.l3(logits)
 
 
@@ -47,7 +49,7 @@ def decay_constant(step: int, total_data_size: int):
     return np.exp(-1 * (1/total_data_size) * step)
 
 def scaled_weight(data: np.ndarray):
-    return 1 / (1 + np.exp(-1 * (data * data)))
+    return 1 / (1 + np.exp(-1 * data))
 
 def convert_to_weight(data: np.ndarray, volitility: float, d: int, total_data_size: int, step: int):
     """
@@ -63,65 +65,76 @@ def convert_to_weight(data: np.ndarray, volitility: float, d: int, total_data_si
     return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))/d) * volitility
 
 def train_model(model, dataset: pd.DataFrame):
-    
-    dimension = 10000
-    num_rows = len(dataset)
-    v = 0.3
-    
-    #Extract the weights
-    model_copy = copy.deepcopy(model)
-    weights = []
-    result_sets = [[], [], []]
-    for item in model_copy.state_dict():
-        if item[-6:] == "weight":
-            weights.append(model_copy.state_dict()[item].numpy())
-        else:
-            continue
+    model.eval()
+    with torch.no_grad():
+        dimension = 10000
+        num_rows = len(dataset)
+        v = 0.5
+
+        #Extract the weights
+        model_copy = copy.deepcopy(model)
+        data_copy = copy.deepcopy(dataset)
+        weights = []
+        biases = []
+        result_sets = [[], [], []]
+        for item in model_copy.state_dict():
+            if item[-6:] == "weight":
+                weights.append(model_copy.state_dict()[item].numpy())
+            else:
+                biases.append(model_copy.state_dict()[item].numpy())
+
+        #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
+        data_copy["z_answers"] = zscore(data_copy['y'])
+        data_copy["z_answers"] = data_copy['z_answers'].abs()
+        sorted_data = data_copy.sort_values(by='z_answers')
+        x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+
+        #Step 1: move the data into the weight dimension
+        for i, item in enumerate(x):
+            new_item = item
+            for j, weight in enumerate(weights):
+                temp = torch.from_numpy(np.dot(weight, new_item) + biases[j])
+                new_item = nn.functional.relu(temp).numpy()
+                result_sets[j].append(new_item)
+
+        #Step 2: convert all of the data into zscores for their respective columns
+        converted_sets = []
+        for result in result_sets:
+            converted_sets.append(zscore(result, axis=1))
+
         
-    #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
-    dataset["z_answers"] = zscore(dataset['y'])
-    sorted_data = dataset.sort_values(by='z_answers')
-    x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
-    
-    #Step 1: move the data into the weight dimension
-    for i, item in enumerate(x):
-        new_item = item
-        for j, weight in enumerate(weights):
-            new_item = nn.functional.relu(torch.from_numpy(np.dot(weight, new_item))).numpy()
-            result_sets[j].append(new_item)
-    #Step 2: convert all of the data into zscores for their respective columns
-    converted_sets = []
-    for result in result_sets:
-        converted_sets.append(zscore(result, axis=1))
+        #pop the final row and add the initial set
+        converted_sets.pop()
+        converted_sets.insert(0, zscore(x, axis=1))   
         
-    #pop the final row and add the initial set
-    converted_sets.pop()
-    converted_sets.insert(0, zscore(x, axis=1))   
-    
-    #Step 3: convert the zscores into delta weights
-    delta_weights = []
-    for set in converted_sets:
-        delta_weights_holder = []
-        for i, row in enumerate(set):
-            calculated_weights = convert_to_weight(row, v, dimension, num_rows, i)
-            delta_weights_holder.append(calculated_weights)
-        delta_weights.append(delta_weights_holder)
-        
-    #step 4: apply the delta weights to the weight matricies of their respective layers
-    for i, deltas in enumerate(delta_weights):
-        for delta in deltas:
-            weights[i] += delta         
-    
-    #Step 5: reapply the weights to a new model and return
-    index = 0
-    for item in model_copy.state_dict():
-        if item[-6:] == "weight":
-            model_copy.state_dict()[item] = weights[i]
-            index += 1
-        else:
-            continue
-    model_copy.load_state_dict(model_copy.state_dict())
-    return model_copy
+        #Step 3: convert the zscores into delta weights
+        delta_weights = []
+        for set in converted_sets:
+            delta_weights_holder = []
+            for i, row in enumerate(set):
+                if np.isnan(row.sum()):
+                    row = np.zeros(len(row))
+                calculated_weights = convert_to_weight(row, v, dimension, num_rows, i)
+                delta_weights_holder.append(calculated_weights)
+            delta_weights.append(delta_weights_holder)
+
+        #step 4: apply the delta weights to the weight matricies of their respective layers
+        stop = False
+        for i, deltas in enumerate(delta_weights):
+            for delta in deltas:
+                weights[i] += delta         
+
+        #Step 5: reapply the weights to a new model and return
+        index = 0
+        for item in model_copy.state_dict():
+            if item[-6:] == "weight":
+                model_copy.state_dict()[item] = weights[i]
+                index += 1
+            else:
+                continue
+        return_model = SmallRegressNetwork().to('cpu')
+        return_model.load_state_dict(model_copy.state_dict())
+        return return_model
 
 def test_accuracy(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
@@ -145,10 +158,12 @@ if __name__ == "__main__":
     data_loader = DataLoader(formatted_data)
     temp_model = SmallRegressNetwork().to('cpu')
     trained_model = train_model(temp_model, pandas_dataset)
-    for i in range(2):
+    for i in range(5):
+        print(f"MSE OF THE TRAINED MODEL AFTER TRAINIGN ROUND {i}: ")
+        test_accuracy(data_loader, trained_model, nn.MSELoss())
         trained_model = train_model(trained_model, pandas_dataset)
+    print("MSE OF THE NON-TRAINED MODEL: ")
     test_accuracy(data_loader, temp_model, nn.MSELoss())
-    test_accuracy(data_loader, trained_model, nn.MSELoss())
     window = 50
     neuron_start = 40
     column_start = 40
