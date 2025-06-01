@@ -167,9 +167,12 @@ if __name__ == "__main__":
         acc = test_accuracy(data_loader, trained_model, nn.MSELoss())
         if acc < min_acc:
             minimum_model = trained_model
+            min_acc = acc
         trained_model = train_model(trained_model, pandas_dataset)
     print("MSE OF THE NON-TRAINED MODEL: ")
     test_accuracy(data_loader, temp_model, nn.MSELoss())
+    print("MSE OF THE MINIMUM MSE MODEL: ")
+    test_accuracy(data_loader, minimum_model, nn.MSELoss())
     window = 50
     neuron_start = 40
     column_start = 40
