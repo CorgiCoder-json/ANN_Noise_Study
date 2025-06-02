@@ -11,6 +11,22 @@ class NetworkSkeleton(nn.Module):
     def forward(self, x):
         return self.layers.forward(x)
 
+def save_network(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, save_file: str):
+    model_copy = copy.deepcopy(model.cpu())
+    fig_number = copy.deepcopy(figure_tracker)
+    for item in model_copy.state_dict():
+        if item[-6:] == "weight":
+            weight_slice = model_copy.state_dict()[item][starting_weight[0]:starting_weight[0]+window_size]
+            fig = plt.figure(fig_number)
+            plt.imshow([temp[starting_weight[1]:starting_weight[1]+window_size] for temp in weight_slice])
+            plt.colorbar()
+            plt.title(label)
+            plt.savefig(save_file)
+            fig_number += 1
+        else:
+            continue
+    model.to(starting_device)
+
 def display_network(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, immediate_diplay: bool = False) -> None:
     model_copy = copy.deepcopy(model.cpu())
     fig_number = copy.deepcopy(figure_tracker)
