@@ -74,6 +74,38 @@ def model_string_generator(input_dim: int, num_hidden: int, num_output: int, act
     output_str += f"{random.choice(activations)}->{prev_output}|{num_output}"
     return output_str
 
+def train(dataloader, model, loss_fn, optimizer, device):
+    size = len(dataloader.dataset)
+    model.train()
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+
+        # Compute prediction error
+        pred = model(X)
+        loss = loss_fn(pred, y.unsqueeze(1))
+
+        # Backpropagation
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+def test(dataloader, model, loss_fn, device):
+    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    model.eval()
+    test_loss, correct = 0, 0
+    with torch.no_grad():
+        for X, y in dataloader:
+            X, y = X.to(device), y.to(device)
+            pred = model(X)
+            test_loss += loss_fn(pred, y.unsqueeze(1)).item()
+            #pred = (pred > 0.5).type(torch.float)
+            #correct += (pred == y.unsqueeze(1)).type(torch.float).sum().item()
+    test_loss /= num_batches
+    #correct /= size
+    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    return test_loss
+
 if __name__ == "__main__":
     # net = NetworkSkeleton(create_layers('128|450->relu->450|130->relu->130|1', {'relu': nn.ReLU()}))
     # print(net)
