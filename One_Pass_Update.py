@@ -8,6 +8,9 @@ from scipy.stats import zscore
 import copy
 import matplotlib.pyplot as plt
 from model_utils import NetworkSkeleton, display_network, create_layers, test
+import math
+
+global_device = 'cuda'
 
 class GeneratedDataset(Dataset):
     def __init__(self, x_data, y_data):
@@ -138,47 +141,37 @@ def train_model(model, dataset: pd.DataFrame):
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
-def test_accuracy(dataloader, model, loss_fn):
-    size = len(dataloader.dataset)
-    num_batches = len(dataloader)
-    model.eval()
-    test_loss, correct = 0, 0
-    with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to('cpu'), y.to('cpu')
-            pred = model(X)
-            test_loss += loss_fn(pred, y.unsqueeze(1)).item()
-    test_loss /= num_batches
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-    return test_loss
+def get_percent_imporvement(start_loss, min_loss):
+    return (math.fabs(start_loss - min_loss) / start_loss) * 100.0
 
 if __name__ == "__main__":
-    small_regression_problem = make_regression(n_samples = 5000, n_features=100, n_informative=10)
-    pandas_dataset = pd.DataFrame(small_regression_problem[0])
-    temp_series = pd.Series(small_regression_problem[1])
-    pandas_dataset["y"] = temp_series
-    formatted_data = GeneratedDataset(small_regression_problem[0], small_regression_problem[1])
+    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_generated.csv")
+    formatted_data = GeneratedDataset(dataset[dataset.columns[dataset.columns != 'y']].to_numpy(), dataset[dataset.columns[dataset.columns == 'y']].to_numpy())
     data_loader = DataLoader(formatted_data)
     temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()}))
-    trained_model = train_model(temp_model, pandas_dataset)
+    trained_model = train_model(temp_model, dataset)
     min_acc = np.inf
     trained_rounds = 0
     minimum_model: NetworkSkeleton = NetworkSkeleton([])
     for i in range(8):
         print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
-        acc = test(data_loader, trained_model, nn.MSELoss(), device='cpu')
+        acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
         print(f"Loss: {acc}")
         if acc < min_acc:
             minimum_model = trained_model
             min_acc = acc
             trained_rounds = i
-        trained_model = train_model(trained_model, pandas_dataset)
+        trained_model = train_model(trained_model, dataset)
+    untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
+    trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
     print("MSE OF THE NON-TRAINED MODEL: ")
-    print(f"Loss: {test(data_loader, temp_model, nn.MSELoss(), device='cpu')}")
+    print(f"Loss: {untrained_acc}")
     print("MSE OF THE MINIMUM MSE MODEL: ")
-    print(f"Loss: {test(data_loader, minimum_model, nn.MSELoss(), device='cpu')}")
+    print(f"Loss: {trained_min_acc}")
+    print("PERCENT IMPROVEMENT: ")
+    print(f"Percent Change: {get_percent_imporvement(untrained_acc, trained_min_acc):.4f}%")
     tracker = 0
-    display_network(temp_model, 50, (0, 0), 'Base Model - No Update', 'cpu', tracker)
+    display_network(temp_model, 50, (0, 0), 'Base Model - No Update', global_device, tracker)
     tracker += 3
-    display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', 'cpu', tracker)
+    display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', global_device, tracker)
     plt.show()

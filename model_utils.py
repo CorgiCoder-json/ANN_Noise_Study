@@ -137,7 +137,7 @@ def test(dataloader, model, loss_fn, device):
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
-            test_loss += loss_fn(pred, y.unsqueeze(1)).item()
+            test_loss += loss_fn(pred, y).item()
     test_loss /= num_batches
     return test_loss
 
