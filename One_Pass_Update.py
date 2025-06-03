@@ -7,6 +7,7 @@ from sklearn.datasets import make_classification, make_regression
 from scipy.stats import zscore
 import copy
 import matplotlib.pyplot as plt
+from model_utils import NetworkSkeleton, display_network, create_layers, test
 
 class GeneratedDataset(Dataset):
     def __init__(self, x_data, y_data):
@@ -133,7 +134,7 @@ def train_model(model, dataset: pd.DataFrame):
                 index += 1
             else:
                 continue
-        return_model = SmallRegressNetwork().to('cpu')
+        return_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to('cpu')
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
@@ -158,47 +159,26 @@ if __name__ == "__main__":
     pandas_dataset["y"] = temp_series
     formatted_data = GeneratedDataset(small_regression_problem[0], small_regression_problem[1])
     data_loader = DataLoader(formatted_data)
-    temp_model = SmallRegressNetwork().to('cpu')
+    temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()}))
     trained_model = train_model(temp_model, pandas_dataset)
     min_acc = np.inf
-    minimum_model: SmallRegressNetwork = SmallRegressNetwork()
+    trained_rounds = 0
+    minimum_model: NetworkSkeleton = NetworkSkeleton([])
     for i in range(8):
         print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
-        acc = test_accuracy(data_loader, trained_model, nn.MSELoss())
+        acc = test(data_loader, trained_model, nn.MSELoss(), device='cpu')
+        print(f"Loss: {acc}")
         if acc < min_acc:
             minimum_model = trained_model
             min_acc = acc
+            trained_rounds = i
         trained_model = train_model(trained_model, pandas_dataset)
     print("MSE OF THE NON-TRAINED MODEL: ")
-    test_accuracy(data_loader, temp_model, nn.MSELoss())
+    print(f"Loss: {test(data_loader, temp_model, nn.MSELoss(), device='cpu')}")
     print("MSE OF THE MINIMUM MSE MODEL: ")
-    test_accuracy(data_loader, minimum_model, nn.MSELoss())
-    window = 50
-    neuron_start = 40
-    column_start = 40
-
-    pre_layer = temp_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
-    post_layer = minimum_model.state_dict()["l2.weight"][neuron_start:neuron_start+window]
-
-    fig = plt.figure(0)
-    plt.imshow([temp[column_start:column_start+window] for temp in pre_layer], cmap='viridis', interpolation='nearest')
-
-    # Add a colorbar for reference
-    plt.colorbar()
-
-    # Add labels (optional)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Heatmap Pre weights ReLU-ReLU')
-
-    fig = plt.figure(1)
-    plt.imshow([temp[column_start:column_start+window] for temp in post_layer], cmap='viridis', interpolation='nearest')
-
-    # Add a colorbar for reference
-    plt.colorbar()
-
-    # Add labels (optional)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Heatmap Post weights ReLU-ReLU')
+    print(f"Loss: {test(data_loader, minimum_model, nn.MSELoss(), device='cpu')}")
+    tracker = 0
+    display_network(temp_model, 50, (0, 0), 'Base Model - No Update', 'cpu', tracker)
+    tracker += 3
+    display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', 'cpu', tracker)
     plt.show()

@@ -1,4 +1,5 @@
 from pyexpat import model
+from matplotlib import figure
 import torch
 import torch.nn as nn
 import copy
@@ -34,22 +35,19 @@ def save_network_heatmap(model: NetworkSkeleton, window_size: int, starting_weig
 
 def display_network(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, immediate_diplay: bool = False) -> None:
     model_copy = copy.deepcopy(model.cpu())
-    fig_number = copy.deepcopy(figure_tracker)
     for item in model_copy.state_dict():
         if item[-6:] == "weight":
             weight_slice = model_copy.state_dict()[item][starting_weight[0]:starting_weight[0]+window_size]
-            fig = plt.figure(fig_number)
+            fig = plt.figure(figure_tracker)
             plt.imshow([temp[starting_weight[1]:starting_weight[1]+window_size] for temp in weight_slice])
             plt.colorbar()
             plt.title(label)
-            fig_number += 1
+            figure_tracker += 1
         else:
             continue
     if immediate_diplay:
         plt.show()
     model.to(starting_device)
-    
-
 
 def create_layers(layer_str: str, str_to_activ: dict[str, nn.Module]) -> list[nn.Module]:
     """Converts a model string into a list of layers to be applied to a SkeletonNetwork

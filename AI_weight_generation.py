@@ -25,6 +25,7 @@ def run_tests_regression(data, device, num_test, epochs, min_error, error_func, 
     data_load_train = DataLoader(data_set_train, batch_size=50, shuffle=True)
     data_load_test = DataLoader(data_set_test, batch_size=50, shuffle=True)
     tracker = 0
+    lr = 1e-4
     for i in range(num_test):
         model_str = model_string_generator(100, 1, 1, list(activation_pool.keys()), (40, 450))
         model = NetworkSkeleton(create_layers(model_str, activation_pool))
@@ -33,14 +34,14 @@ def run_tests_regression(data, device, num_test, epochs, min_error, error_func, 
         j = 0
         acc = min_error + 1
         while j < epochs and min_error < acc:
-            train(data_load_train, model, error_func, optimize(model.parameters(), lr=1e-4),device)
+            train(data_load_train, model, error_func, optimize(model.parameters(), lr=lr),device)
             acc = test(data_load_test, model, error_func, device)
             print(acc)
             j += 1
         save_network_heatmap(model, 50, (0,0),  model_str + '_post', device, tracker, path.join("regression","heatmaps",model_str_file_name(model_str) + "_post"))
         save_model_parameters(model, model_str, 'post', 'regression', device)
         with open(path.join("regression", "reports", model_str_file_name(model_str) + "_report.txt"), 'wt') as file:
-            file.write(f"Model String: {model_str}\nModel Accuracy: {acc}\nEpochs Ran: {j}\nOptimizer: {optimize}\nError Function: {error_func}")
+            file.write(f"Model String: {model_str}\nModel Accuracy: {acc}\nEpochs Ran: {j}\nOptimizer: {optimize}\nLearning Rate: {1e-4}\nError Function: {error_func}")
             
 if __name__ == "__main__":
     data = make_regression(n_samples = 5000, n_features=100, n_informative=10)
