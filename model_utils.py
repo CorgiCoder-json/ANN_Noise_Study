@@ -49,18 +49,7 @@ def display_network(model: NetworkSkeleton, window_size: int, starting_weight: t
         plt.show()
     model.to(starting_device)
     
-def save_model_parameters(model, model_str, pre_or_post, problem_type, device):
-    ID = 1
-    model_copy = copy.deepcopy(model.cpu())
-    for item in model_copy.state_dict():
-        if item[-6:] == "weight":
-            table = pd.DataFrame(model_copy[item])
-            table.to_csv(path.join(f"{problem_type}", "weights", f"{model_str}_{pre_or_post}.csv"),index=False)
-        else:
-            series = pd.Series(model_copy[item])
-            series.to_csv(path.join(f"{problem_type}", "biases", f"{model_str}_{pre_or_post}.csv"),index=False)
-        ID += 1
-    model.to(device)
+
 
 def create_layers(layer_str: str, str_to_activ: dict[str, nn.Module]) -> list[nn.Module]:
     """Converts a model string into a list of layers to be applied to a SkeletonNetwork
@@ -110,7 +99,23 @@ def model_string_generator(input_dim: int, num_hidden: int, num_output: int, act
 
 def model_str_file_name(model_str):
     file_path = model_str.replace('->', '_').replace('|', '-')
-    return file_path        
+    return file_path 
+
+def save_model_parameters(model, model_str, pre_or_post, problem_type, device):
+    ID = 1
+    model_copy = copy.deepcopy(model.cpu())
+    params = model_copy.state_dict()
+    layer = 1
+    for item in params:
+        if item[-6:] == "weight":
+            table = pd.DataFrame(params[item])
+            table.to_csv(path.join(f"{problem_type}", "weights", f"{model_str_file_name(model_str)}_{pre_or_post}_layer_{layer}.csv"),index=False)
+        else:
+            series = pd.Series(params[item])
+            series.to_csv(path.join(f"{problem_type}", "biases", f"{model_str_file_name(model_str)}_{pre_or_post}_layer_{layer}.csv"),index=False)
+            layer += 1
+        ID += 1
+    model.to(device)       
     
 def train(dataloader, model, loss_fn, optimizer, device):
     model.train()

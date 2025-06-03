@@ -1,0 +1,5 @@
+Model String: 100|248->relu->248|373->relu->373|1
+Model Accuracy: 283.1966156005859
+Epochs Ran: 2
+Optimizer: <class 'torch.optim.sgd.SGD'>
+Error Function: MSELoss()
