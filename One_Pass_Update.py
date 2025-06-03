@@ -7,7 +7,7 @@ from sklearn.datasets import make_classification, make_regression
 from scipy.stats import zscore
 import copy
 import matplotlib.pyplot as plt
-from model_utils import NetworkSkeleton, display_network, create_layers, test
+from model_utils import NetworkSkeleton, display_network, create_layers, save_model_parameters, test
 import math
 import seaborn as sns
 
@@ -153,12 +153,13 @@ if __name__ == "__main__":
     data_loader = DataLoader(formatted_data)
     percent_improvements = []
     trained_min_loss = []
-    for _ in range(5):
+    for j in range(32):
         temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to(global_device)
         trained_model = train_model(temp_model, dataset)
         min_acc = np.inf
         trained_rounds = 0
         minimum_model: NetworkSkeleton = NetworkSkeleton([])
+        save_model_parameters(temp_model, '100|128->relu->128|128->relu->128|1', f'pre_round_{j}', 'D:\\regression', global_device)
         for i in range(8):
             print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
             acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
@@ -170,6 +171,7 @@ if __name__ == "__main__":
             trained_model = train_model(trained_model, dataset)
         untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
         trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
+        save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)
         improvement = get_percent_imporvement(untrained_acc, trained_min_acc)
         percent_improvements.append(improvement)
         trained_min_loss.append(trained_rounds)
@@ -186,6 +188,8 @@ if __name__ == "__main__":
         # plt.show()
     temp = pd.DataFrame({"percentages": percent_improvements})
     temp2 = pd.DataFrame({"rounds": trained_min_loss})
+    temp.to_csv("D:\\percentage_change.csv")
+    temp2.to_csv("D:\\min_rounds.csv")
     sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
     sns.histplot(temp2, x='rounds', kde=True).set_title("Rounds to meet minimum loss")
     plt.show()
