@@ -9,6 +9,7 @@ import copy
 import matplotlib.pyplot as plt
 from model_utils import NetworkSkeleton, display_network, create_layers, test
 import math
+import seaborn as sns
 
 global_device = 'cuda'
 
@@ -69,13 +70,14 @@ def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int,
     return -1 * np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
 
 def train_model(model, dataset: pd.DataFrame):
+    global global_device
     model.eval()
     with torch.no_grad():
         num_rows = len(dataset)
         v = 0.00007
 
         #Extract the weights
-        model_copy = copy.deepcopy(model)
+        model_copy = copy.deepcopy(model.cpu())
         data_copy = copy.deepcopy(dataset)
         weights = []
         biases = []
@@ -85,6 +87,7 @@ def train_model(model, dataset: pd.DataFrame):
                 weights.append(model_copy.state_dict()[item].numpy())
             else:
                 biases.append(model_copy.state_dict()[item].numpy())
+        model.to(global_device)
 
         #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
         # data_copy["z_answers"] = zscore(data_copy['y'])
@@ -137,7 +140,7 @@ def train_model(model, dataset: pd.DataFrame):
                 index += 1
             else:
                 continue
-        return_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to('cpu')
+        return_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to(global_device)
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
@@ -148,30 +151,41 @@ if __name__ == "__main__":
     dataset = pd.read_csv("generated_data_sets/small_5000_100_10_generated.csv")
     formatted_data = GeneratedDataset(dataset[dataset.columns[dataset.columns != 'y']].to_numpy(), dataset[dataset.columns[dataset.columns == 'y']].to_numpy())
     data_loader = DataLoader(formatted_data)
-    temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()}))
-    trained_model = train_model(temp_model, dataset)
-    min_acc = np.inf
-    trained_rounds = 0
-    minimum_model: NetworkSkeleton = NetworkSkeleton([])
-    for i in range(8):
-        print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
-        acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
-        print(f"Loss: {acc}")
-        if acc < min_acc:
-            minimum_model = trained_model
-            min_acc = acc
-            trained_rounds = i
-        trained_model = train_model(trained_model, dataset)
-    untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
-    trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
-    print("MSE OF THE NON-TRAINED MODEL: ")
-    print(f"Loss: {untrained_acc}")
-    print("MSE OF THE MINIMUM MSE MODEL: ")
-    print(f"Loss: {trained_min_acc}")
-    print("PERCENT IMPROVEMENT: ")
-    print(f"Percent Change: {get_percent_imporvement(untrained_acc, trained_min_acc):.4f}%")
-    tracker = 0
-    display_network(temp_model, 50, (0, 0), 'Base Model - No Update', global_device, tracker)
-    tracker += 3
-    display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', global_device, tracker)
+    percent_improvements = []
+    trained_min_loss = []
+    for _ in range(5):
+        temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to(global_device)
+        trained_model = train_model(temp_model, dataset)
+        min_acc = np.inf
+        trained_rounds = 0
+        minimum_model: NetworkSkeleton = NetworkSkeleton([])
+        for i in range(8):
+            print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
+            acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
+            print(f"Loss: {acc}")
+            if acc < min_acc:
+                minimum_model = trained_model
+                min_acc = acc
+                trained_rounds = i
+            trained_model = train_model(trained_model, dataset)
+        untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
+        trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
+        improvement = get_percent_imporvement(untrained_acc, trained_min_acc)
+        percent_improvements.append(improvement)
+        trained_min_loss.append(trained_rounds)
+        print("MSE OF THE NON-TRAINED MODEL: ")
+        print(f"Loss: {untrained_acc}")
+        print("MSE OF THE MINIMUM MSE MODEL: ")
+        print(f"Loss: {trained_min_acc}")
+        print("PERCENT IMPROVEMENT: ")
+        print(f"Percent Change: {improvement:.4f}%")
+        # tracker = 0
+        # display_network(temp_model, 50, (0, 0), 'Base Model - No Update', global_device, tracker)
+        # tracker += 3
+        # display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', global_device, tracker)
+        # plt.show()
+    temp = pd.DataFrame({"percentages": percent_improvements})
+    temp2 = pd.DataFrame({"rounds": trained_min_loss})
+    sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
+    sns.histplot(temp2, x='rounds', kde=True).set_title("Rounds to meet minimum loss")
     plt.show()
