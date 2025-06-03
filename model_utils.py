@@ -3,6 +3,8 @@ import torch.nn as nn
 import copy
 import matplotlib.pyplot as plt
 import random
+import pandas as pd
+import os.path as path
 
 class NetworkSkeleton(nn.Module):
     def __init__(self, layers):
@@ -11,7 +13,7 @@ class NetworkSkeleton(nn.Module):
     def forward(self, x):
         return self.layers.forward(x)
 
-def save_network(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, save_file: str):
+def save_network_heatmap(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, save_file: str):
     model_copy = copy.deepcopy(model.cpu())
     fig_number = copy.deepcopy(figure_tracker)
     for item in model_copy.state_dict():
@@ -43,6 +45,19 @@ def display_network(model: NetworkSkeleton, window_size: int, starting_weight: t
     if immediate_diplay:
         plt.show()
     model.to(starting_device)
+    
+def save_model_parameters(model, model_str, pre_or_post, problem_type, device):
+    ID = 1
+    model_copy = copy.deepcopy(model.cpu())
+    for item in model_copy.state_dict():
+        if item[-6:] == "weight":
+            table = pd.DataFrame(model_copy[item])
+            table.to_csv(path.join(f"{problem_type}", "weights", f"{model_str}_{pre_or_post}.csv"),index=False)
+        else:
+            series = pd.Series(model_copy[item])
+            series.to_csv(path.join(f"{problem_type}", "biases", f"{model_str}_{pre_or_post}.csv"),index=False)
+        ID += 1
+    model.to(device)
 
 def create_layers(layer_str: str, str_to_activ: dict[str, nn.Module]) -> list[nn.Module]:
     """Converts a model string into a list of layers to be applied to a SkeletonNetwork
