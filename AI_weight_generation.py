@@ -1,5 +1,5 @@
 from sklearn.datasets import make_regression
-from model_utils import save_network_heatmap, create_layers, model_string_generator, train, test, NetworkSkeleton
+from model_utils import save_network_heatmap, create_layers, model_string_generator, train, test, model_str_file_name, NetworkSkeleton
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
@@ -28,14 +28,16 @@ def run_tests_regression(data, device, num_test, epochs, min_error, error_func, 
     for i in range(num_test):
         model_str = model_string_generator(100, 1, 1, list(activation_pool.keys()), (40, 450))
         model = NetworkSkeleton(create_layers(model_str, activation_pool))
-        save_network_heatmap(model, 50, (0,0), model_str + '_pre', device, tracker,  path.join("regression","heatmaps",model_str + "_pre.png"))
+        save_network_heatmap(model, 50, (0,0), model_str + '_pre', device, tracker,  path.join("regression","heatmaps",model_str_file_name(model_str) + "_pre"))
         j = 0
+        acc = min_error + 1
         while j < epochs and min_error < acc:
             train(data_load_train, model, error_func, optimize(model.parameters(), lr=1e-4),device)
             acc = test(data_load_test, model, error_func, device)
             print(acc)
-        save_network_heatmap(model, 50, (0,0),  model_str + '_post', device, tracker, path.join("regression","heatmaps",model_str + "_post.png"))
-        with open(path.join("regression", "reports", model_str + "_report.txt"), 'wt') as file:
+            j += 1
+        save_network_heatmap(model, 50, (0,0),  model_str + '_post', device, tracker, path.join("regression","heatmaps",model_str_file_name(model_str) + "_post"))
+        with open(path.join("regression", "reports", model_str_file_name(model_str) + "_report.txt"), 'wt') as file:
             file.write(f"Model String: {model_str}\nModel Accuracy: {acc}\nEpochs Ran: {j}\nOptimizer: {optimize}\nError Function: {error_func}")
             
 if __name__ == "__main__":

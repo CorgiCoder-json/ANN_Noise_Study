@@ -1,3 +1,4 @@
+from pyexpat import model
 import torch
 import torch.nn as nn
 import copy
@@ -11,11 +12,12 @@ class NetworkSkeleton(nn.Module):
         super().__init__()
         self.layers = nn.Sequential(*layers)
     def forward(self, x):
-        return self.layers.forward(x)
+        return self.layers.forward(x.type(torch.float))
 
 def save_network_heatmap(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, save_file: str):
     model_copy = copy.deepcopy(model.cpu())
     fig_number = copy.deepcopy(figure_tracker)
+    layer = 1
     for item in model_copy.state_dict():
         if item[-6:] == "weight":
             weight_slice = model_copy.state_dict()[item][starting_weight[0]:starting_weight[0]+window_size]
@@ -23,8 +25,9 @@ def save_network_heatmap(model: NetworkSkeleton, window_size: int, starting_weig
             plt.imshow([temp[starting_weight[1]:starting_weight[1]+window_size] for temp in weight_slice])
             plt.colorbar()
             plt.title(label)
-            plt.savefig(save_file)
+            plt.savefig(f"{save_file}_layer_{layer}.png")
             fig_number += 1
+            layer += 1
         else:
             continue
     model.to(starting_device)
@@ -105,6 +108,10 @@ def model_string_generator(input_dim: int, num_hidden: int, num_output: int, act
     output_str += f"{random.choice(activations)}->{prev_output}|{num_output}"
     return output_str
 
+def model_str_file_name(model_str):
+    file_path = model_str.replace('->', '_').replace('|', '-')
+    return file_path        
+    
 def train(dataloader, model, loss_fn, optimizer, device):
     model.train()
     for X, y in dataloader:
