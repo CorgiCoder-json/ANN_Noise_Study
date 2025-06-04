@@ -1,3 +1,12 @@
+"""
+This algorithm is meant to partially challenge backpropigation in time and space complexity. The foundations for 
+backpropigation time complexity can be found in the link here:
+https://ai.stackexchange.com/questions/5728/what-is-the-time-complexity-for-training-a-neural-network-using-back-propagation
+
+This approach has an advantage in that there is no need to store and calculate gradients, which can
+greatly save both time and space.
+"""
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
@@ -63,7 +72,6 @@ def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int,
     Args:
         data (np.ndarray): the row of data that is to be converted. Should already be in z-score form
         volitility (float): controls how much change each weight should have. Higher values result in higher delta weights and vice versa for lower values 
-        d (int): The "dimension" the model weights reside in. For example, if weights are between 0.8 and -0.8, d should be 10, since the weights exsist in the "tenths dimension"
         total_data_size (int): this size of the data set that the row comes from
         step (int): the row number of the data input
     """
@@ -74,7 +82,7 @@ def train_model(model, dataset: pd.DataFrame):
     model.eval()
     with torch.no_grad():
         num_rows = len(dataset)
-        v = 0.00008
+        v = 0.00005
 
         #Extract the weights
         model_copy = copy.deepcopy(model.cpu())
@@ -92,7 +100,7 @@ def train_model(model, dataset: pd.DataFrame):
         #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
         data_copy["z_answers"] = zscore(data_copy['y'])
         data_copy["z_answers"] = data_copy['z_answers'].abs()
-        sorted_data = data_copy.sort_values(by='z_answers')
+        sorted_data = data_copy.sort_values(by='z_answers', ascending=True)
         x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
         # data_copy = data_copy.sample(frac=1)
         # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
@@ -102,7 +110,8 @@ def train_model(model, dataset: pd.DataFrame):
             new_item = item
             for j, weight in enumerate(weights):
                 temp = torch.from_numpy(np.dot(weight, new_item) + biases[j])
-                new_item = nn.functional.relu(temp).numpy()
+                if j != 2:
+                    new_item = nn.functional.silu(temp).numpy()
                 result_sets[j].append(new_item)
 
         #Step 2: convert all of the data into zscores for their respective columns
@@ -138,7 +147,7 @@ def train_model(model, dataset: pd.DataFrame):
                 index += 1
             else:
                 continue
-        return_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to(global_device)
+        return_model = NetworkSkeleton(create_layers('100|200->silu->200|150->silu->150|1', {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
@@ -146,13 +155,15 @@ def get_percent_imporvement(start_loss, min_loss):
     return (math.fabs(start_loss - min_loss) / start_loss) * 100.0
 
 if __name__ == "__main__":
-    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_generated.csv")
+    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
     formatted_data = GeneratedDataset(dataset[dataset.columns[dataset.columns != 'y']].to_numpy(), dataset[dataset.columns[dataset.columns == 'y']].to_numpy())
     data_loader = DataLoader(formatted_data)
     percent_improvements = []
     trained_min_loss = []
+    losses = []
+    model_str = '100|200->silu->200|150->silu->150|1'
     for j in range(1):
-        temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to(global_device)
+        temp_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
         trained_model = train_model(temp_model, dataset)
         min_acc = np.inf
         trained_rounds = 0
@@ -162,6 +173,7 @@ if __name__ == "__main__":
             print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
             acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
             print(f"Loss: {acc}")
+            losses.append(acc)
             if acc < min_acc:
                 minimum_model = trained_model
                 min_acc = acc
@@ -179,13 +191,18 @@ if __name__ == "__main__":
         print(f"Loss: {trained_min_acc}")
         print("PERCENT IMPROVEMENT: ")
         print(f"Percent Change: {improvement:.4f}%")
-        # tracker = 0
-        # display_network(temp_model, 50, (0, 0), 'Base Model - No Update', global_device, tracker)
-        # tracker += 3
-        # display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', global_device, tracker)
-        # plt.show()
+        tracker = 0
+        display_network(temp_model, 50, (0, 0), 'Base Model - No Update', global_device, tracker)
+        tracker += 3
+        display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', global_device, tracker)
+        plt.show()
     temp = pd.DataFrame({"percentages": percent_improvements})
     temp2 = pd.DataFrame({"rounds": trained_min_loss})
+    plt.plot(losses)
+    plt.title("Loses over epochs")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.show()
     #temp.to_csv("D:\\percentage_change.csv")
     #temp2.to_csv("D:\\min_rounds.csv")
     # sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
