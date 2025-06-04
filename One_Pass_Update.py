@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 from model_utils import NetworkSkeleton, display_network, create_layers, save_model_parameters, test
 import math
 import seaborn as sns
+from dropout_pass_update import train_model_dropout
 
 global_device = 'cuda'
 
@@ -77,7 +78,7 @@ def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int,
     """
     return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
 
-def train_model(model, dataset: pd.DataFrame):
+def train_model(model, dataset: pd.DataFrame, model_str):
     global global_device
     model.eval()
     with torch.no_grad():
@@ -124,20 +125,13 @@ def train_model(model, dataset: pd.DataFrame):
         converted_sets.insert(0, zscore(x, axis=0))   
         
         #Step 3: convert the zscores into delta weights
-        delta_weights = []
-        for set in converted_sets:
-            delta_weights_holder = []
-            for i, row in enumerate(set):
+        #Step 4: apply the delta weights to ALL neurons in the layer
+        for i, set in enumerate(converted_sets):
+            for j, row in enumerate(set):
                 if np.isnan(row.sum()):
                     row = np.nan_to_num(row)
-                calculated_weights = convert_to_weight(row, v, num_rows, i)
-                delta_weights_holder.append(calculated_weights)
-            delta_weights.append(delta_weights_holder)
-
-        #step 4: apply the delta weights to the weight matricies of their respective layers
-        for i, deltas in enumerate(delta_weights):
-            for delta in deltas:
-                weights[i] += delta         
+                calculated_weights = convert_to_weight(row, v, num_rows, j)
+                weights[i] += calculated_weights      
 
         #Step 5: reapply the weights to a new model and return
         index = 0
@@ -147,7 +141,7 @@ def train_model(model, dataset: pd.DataFrame):
                 index += 1
             else:
                 continue
-        return_model = NetworkSkeleton(create_layers('100|200->silu->200|150->silu->150|1', {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
+        return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
@@ -161,10 +155,10 @@ if __name__ == "__main__":
     percent_improvements = []
     trained_min_loss = []
     losses = []
-    model_str = '100|200->silu->200|150->silu->150|1'
+    model_string = '100|200->silu->200|150->silu->150|1'
     for j in range(1):
-        temp_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
-        trained_model = train_model(temp_model, dataset)
+        temp_model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
+        trained_model = train_model_dropout(temp_model, dataset, model_string, global_device)
         min_acc = np.inf
         trained_rounds = 0
         minimum_model: NetworkSkeleton = NetworkSkeleton([])
@@ -178,7 +172,7 @@ if __name__ == "__main__":
                 minimum_model = trained_model
                 min_acc = acc
                 trained_rounds = i
-            trained_model = train_model(trained_model, dataset)
+            trained_model = train_model_dropout(trained_model, dataset, model_string, global_device)
         untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
         trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
         #save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)
