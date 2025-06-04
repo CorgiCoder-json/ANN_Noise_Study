@@ -67,14 +67,14 @@ def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int,
         total_data_size (int): this size of the data set that the row comes from
         step (int): the row number of the data input
     """
-    return -1 * np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
+    return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
 
 def train_model(model, dataset: pd.DataFrame):
     global global_device
     model.eval()
     with torch.no_grad():
         num_rows = len(dataset)
-        v = 0.00007
+        v = 0.00008
 
         #Extract the weights
         model_copy = copy.deepcopy(model.cpu())
@@ -90,12 +90,12 @@ def train_model(model, dataset: pd.DataFrame):
         model.to(global_device)
 
         #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
-        # data_copy["z_answers"] = zscore(data_copy['y'])
-        # data_copy["z_answers"] = data_copy['z_answers'].abs()
-        # sorted_data = data_copy.sort_values(by='z_answers')
-        # x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
-        data_copy = data_copy.sample(frac=1)
-        x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
+        data_copy["z_answers"] = zscore(data_copy['y'])
+        data_copy["z_answers"] = data_copy['z_answers'].abs()
+        sorted_data = data_copy.sort_values(by='z_answers')
+        x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+        # data_copy = data_copy.sample(frac=1)
+        # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
 
         #Step 1: move the data into the weight dimension
         for i, item in enumerate(x):
@@ -108,12 +108,11 @@ def train_model(model, dataset: pd.DataFrame):
         #Step 2: convert all of the data into zscores for their respective columns
         converted_sets = []
         for result in result_sets:
-            converted_sets.append(zscore(result, axis=1))
-
+            converted_sets.append(zscore(result, axis=0))
         
         #pop the final row and add the initial set
         converted_sets.pop()
-        converted_sets.insert(0, zscore(x, axis=1))   
+        converted_sets.insert(0, zscore(x, axis=0))   
         
         #Step 3: convert the zscores into delta weights
         delta_weights = []
@@ -121,13 +120,12 @@ def train_model(model, dataset: pd.DataFrame):
             delta_weights_holder = []
             for i, row in enumerate(set):
                 if np.isnan(row.sum()):
-                    row = 2 * np.random.random_sample((len(row))) - 1
+                    row = np.nan_to_num(row)
                 calculated_weights = convert_to_weight(row, v, num_rows, i)
                 delta_weights_holder.append(calculated_weights)
             delta_weights.append(delta_weights_holder)
 
         #step 4: apply the delta weights to the weight matricies of their respective layers
-        stop = False
         for i, deltas in enumerate(delta_weights):
             for delta in deltas:
                 weights[i] += delta         
@@ -153,13 +151,13 @@ if __name__ == "__main__":
     data_loader = DataLoader(formatted_data)
     percent_improvements = []
     trained_min_loss = []
-    for j in range(32):
+    for j in range(1):
         temp_model = NetworkSkeleton(create_layers('100|128->relu->128|128->relu->128|1', {'relu': nn.ReLU()})).to(global_device)
         trained_model = train_model(temp_model, dataset)
         min_acc = np.inf
         trained_rounds = 0
         minimum_model: NetworkSkeleton = NetworkSkeleton([])
-        save_model_parameters(temp_model, '100|128->relu->128|128->relu->128|1', f'pre_round_{j}', 'D:\\regression', global_device)
+        #save_model_parameters(temp_model, '100|128->relu->128|128->relu->128|1', f'pre_round_{j}', 'D:\\regression', global_device)
         for i in range(8):
             print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
             acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
@@ -171,7 +169,7 @@ if __name__ == "__main__":
             trained_model = train_model(trained_model, dataset)
         untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
         trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
-        save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)
+        #save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)
         improvement = get_percent_imporvement(untrained_acc, trained_min_acc)
         percent_improvements.append(improvement)
         trained_min_loss.append(trained_rounds)
@@ -188,8 +186,8 @@ if __name__ == "__main__":
         # plt.show()
     temp = pd.DataFrame({"percentages": percent_improvements})
     temp2 = pd.DataFrame({"rounds": trained_min_loss})
-    temp.to_csv("D:\\percentage_change.csv")
-    temp2.to_csv("D:\\min_rounds.csv")
-    sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
-    sns.histplot(temp2, x='rounds', kde=True).set_title("Rounds to meet minimum loss")
-    plt.show()
+    #temp.to_csv("D:\\percentage_change.csv")
+    #temp2.to_csv("D:\\min_rounds.csv")
+    # sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
+    # sns.histplot(temp2, x='rounds', kde=True).set_title("Rounds to meet minimum loss")
+    # plt.show()
