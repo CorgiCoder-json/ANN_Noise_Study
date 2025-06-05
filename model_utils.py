@@ -122,7 +122,7 @@ def train(dataloader, model, loss_fn, optimizer, device):
 
         # Compute prediction error
         pred = model(X)
-        loss = loss_fn(pred, y.unsqueeze(1))
+        loss = loss_fn(pred, y)
 
         # Backpropagation
         optimizer.zero_grad()

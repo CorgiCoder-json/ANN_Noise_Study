@@ -78,7 +78,7 @@ def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int,
     """
     return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
 
-def train_model(model, dataset: pd.DataFrame, model_str):
+def train_model(model, dataset: pd.DataFrame, model_str, device):
     global global_device
     model.eval()
     with torch.no_grad():
@@ -96,7 +96,7 @@ def train_model(model, dataset: pd.DataFrame, model_str):
                 weights.append(model_copy.state_dict()[item].numpy())
             else:
                 biases.append(model_copy.state_dict()[item].numpy())
-        model.to(global_device)
+        model.to(device)
 
         #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
         data_copy["z_answers"] = zscore(data_copy['y'])
@@ -141,7 +141,7 @@ def train_model(model, dataset: pd.DataFrame, model_str):
                 index += 1
             else:
                 continue
-        return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
+        return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
