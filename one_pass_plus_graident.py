@@ -6,7 +6,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from model_utils import NetworkSkeleton, create_layers, test, train
 import copy
-global_device = 'cuda'
+global_device = 'cpu'
 
 class GeneratedDataset(Dataset):
     def __init__(self, x_data, y_data):
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     percent_improvements = []
     trained_min_loss = []
     losses = []
-    model_string = '100|200->silu->200|150->silu->150|1'
+    model_string = '100|200->relu->200|150->relu->150|1'
     temp_model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()}))
     model_copy = copy.deepcopy(temp_model)
     model_copy.to(global_device)
@@ -45,17 +45,18 @@ if __name__ == "__main__":
         print(f"Loss: {acc}")
         losses.append(acc)
         if acc < min_acc:
-            minimum_model = trained_model
+            minimum_model = copy.deepcopy(trained_model.cpu())
+            trained_model.to(global_device)
             min_acc = acc
             trained_rounds = i
         trained_model = train_model(trained_model, dataset, model_string, global_device)
     print("One pass step completed. Testing gradient descent...")
     for i in range(8):
-        train(data_loader_train, minimum_model, nn.MSELoss(), torch.optim.SGD(minimum_model.parameters(), lr=1e-3), global_device)
+        train(data_loader_train, minimum_model, nn.MSELoss(), torch.optim.SGD(minimum_model.parameters(), lr=1e-5), global_device)
         print(test(data_loader_test, minimum_model, nn.MSELoss(), device=global_device))
     print("Gradient Descent + one pass completed. Testing random model...")
     for i in range(8):
-        train(data_loader_train, model_copy, nn.MSELoss(), torch.optim.SGD(model_copy.parameters(), lr=1e-3), global_device)
+        train(data_loader_train, model_copy, nn.MSELoss(), torch.optim.SGD(model_copy.parameters(), lr=1e-5), global_device)
         print(test(data_loader_test, model_copy, nn.MSELoss(), device=global_device))
     print("Experiments complete! Review.")
         
