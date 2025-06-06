@@ -155,7 +155,7 @@ if __name__ == "__main__":
     percent_improvements = []
     trained_min_loss = []
     losses = []
-    model_string = '100|200->silu->200|150->silu->150|1'
+    model_string = '100|200->silu->200|150->relu->150|1'
     for j in range(1):
         temp_model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
         trained_model = train_model_dropout(temp_model, dataset, model_string, global_device)
@@ -185,11 +185,6 @@ if __name__ == "__main__":
         print(f"Loss: {trained_min_acc}")
         print("PERCENT IMPROVEMENT: ")
         print(f"Percent Change: {improvement:.4f}%")
-        tracker = 0
-        display_network(temp_model, 50, (0, 0), 'Base Model - No Update', global_device, tracker)
-        tracker += 3
-        display_network(minimum_model, 50, (0, 0), f'Best Model - {trained_rounds} rounds', global_device, tracker)
-        plt.show()
     temp = pd.DataFrame({"percentages": percent_improvements})
     temp2 = pd.DataFrame({"rounds": trained_min_loss})
     plt.plot(losses)

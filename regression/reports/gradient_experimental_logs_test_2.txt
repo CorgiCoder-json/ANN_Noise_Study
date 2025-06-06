@@ -1,0 +1,1155 @@
+Logs for One Pass + gradient descent experiments
+Model String: 100|200->silu->200|150->relu->150|1
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34768.537160425585
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34451.73610125084
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34116.596568629
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33851.95655664523
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33680.436530203086
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33587.65889889799
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33549.686058913794
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33548.737239984126
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15705.422224833079
+MSE Loss for Gradient: 163.87246260432002
+MSE Loss for One Pass + Gradient: 1197.606867290202
+MSE Loss for Gradient: 31.234573349593497
+MSE Loss for One Pass + Gradient: 68.31374763048882
+MSE Loss for Gradient: 20.264380882543918
+MSE Loss for One Pass + Gradient: 27.324121058856488
+MSE Loss for Gradient: 15.577313206699328
+MSE Loss for One Pass + Gradient: 20.03552270981122
+MSE Loss for Gradient: 12.744612715258336
+MSE Loss for One Pass + Gradient: 16.62293806032621
+MSE Loss for Gradient: 10.988155666364298
+MSE Loss for One Pass + Gradient: 14.592794844352117
+MSE Loss for Gradient: 9.713546845269855
+MSE Loss for One Pass + Gradient: 12.919069422484087
+MSE Loss for Gradient: 8.869040190012768
+Round 0 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34788.15822450642
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34491.9729593149
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34168.13706999208
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33912.78535478651
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33745.037269200984
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33653.43817289017
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33615.433551697286
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33615.46953144233
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15720.583649447124
+MSE Loss for Gradient: 138.91195872620824
+MSE Loss for One Pass + Gradient: 14805.31009212619
+MSE Loss for Gradient: 42.02443610340735
+MSE Loss for One Pass + Gradient: 14083.855963887407
+MSE Loss for Gradient: 29.59870043559139
+MSE Loss for One Pass + Gradient: 13432.316049408624
+MSE Loss for Gradient: 22.184136989035526
+MSE Loss for One Pass + Gradient: 1036.655914845992
+MSE Loss for Gradient: 17.57017540800311
+MSE Loss for One Pass + Gradient: 76.67335960939596
+MSE Loss for Gradient: 14.568089010204247
+MSE Loss for One Pass + Gradient: 28.60580376566574
+MSE Loss for Gradient: 12.519900499163894
+MSE Loss for One Pass + Gradient: 16.87655361182941
+MSE Loss for Gradient: 11.088971660580777
+Round 1 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34793.892122797304
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34507.05635372206
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34188.75911755568
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33934.75239015291
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33767.36647345757
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33676.703017779044
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33642.58503021236
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33649.30704394974
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 901.0867677404894
+MSE Loss for Gradient: 141.27354174452344
+MSE Loss for One Pass + Gradient: 86.58175871090398
+MSE Loss for Gradient: 42.128698604226344
+MSE Loss for One Pass + Gradient: 36.34338718024141
+MSE Loss for Gradient: 29.15009845070036
+MSE Loss for One Pass + Gradient: 27.155625866877585
+MSE Loss for Gradient: 22.21328755967418
+MSE Loss for One Pass + Gradient: 22.512779225068165
+MSE Loss for Gradient: 17.952998486421013
+MSE Loss for One Pass + Gradient: 19.38865807757595
+MSE Loss for Gradient: 15.127472301517672
+MSE Loss for One Pass + Gradient: 17.172047181806587
+MSE Loss for Gradient: 13.184940540084382
+MSE Loss for One Pass + Gradient: 15.442840190770468
+MSE Loss for Gradient: 11.790614796699664
+Round 2 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34761.588152330114
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34399.75440870218
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34017.8546267868
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33731.05790630837
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33558.06564645687
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33471.0208992457
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33432.9732630702
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33419.34261187622
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15732.130586562726
+MSE Loss for Gradient: 145.83823314528564
+MSE Loss for One Pass + Gradient: 14798.870830847427
+MSE Loss for Gradient: 43.32483917711815
+MSE Loss for One Pass + Gradient: 14082.403577696357
+MSE Loss for Gradient: 32.49337823221332
+MSE Loss for One Pass + Gradient: 13378.399044061844
+MSE Loss for Gradient: 25.513658610080252
+MSE Loss for One Pass + Gradient: 108.44140052293766
+MSE Loss for Gradient: 20.772834242588637
+MSE Loss for One Pass + Gradient: 20.442040004962895
+MSE Loss for Gradient: 17.39352794925007
+MSE Loss for One Pass + Gradient: 12.630995284206492
+MSE Loss for Gradient: 14.932698983861949
+MSE Loss for One Pass + Gradient: 10.054552071838174
+MSE Loss for Gradient: 13.121843892716978
+Round 3 complete.
+IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34794.466309261115
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34514.64772304573
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34207.160464944245
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33967.10513555837
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33812.68632975457
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33735.68076536584
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33718.19189426466
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33747.077809768496
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15713.05788761348
+MSE Loss for Gradient: 140.18181629722477
+MSE Loss for One Pass + Gradient: 13374.530830282853
+MSE Loss for Gradient: 38.1465535312361
+MSE Loss for One Pass + Gradient: 219.65418362565367
+MSE Loss for Gradient: 25.038404057900713
+MSE Loss for One Pass + Gradient: 44.053006615991876
+MSE Loss for Gradient: 18.371400956896554
+MSE Loss for One Pass + Gradient: 23.32787001648976
+MSE Loss for Gradient: 14.638585448445127
+MSE Loss for One Pass + Gradient: 16.610816564722118
+MSE Loss for Gradient: 12.304401700088288
+MSE Loss for One Pass + Gradient: 13.278783015958266
+MSE Loss for Gradient: 10.766229731350089
+MSE Loss for One Pass + Gradient: 11.212029427281056
+MSE Loss for Gradient: 9.685011900189943
+Round 4 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34820.764552015884
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34606.70509433365
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34379.65118041581
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 34203.14465004337
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 34095.17701943958
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 34061.86378793007
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 34097.04764695717
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 34195.34926613918
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 846.7565804022329
+MSE Loss for Gradient: 126.76065023983881
+MSE Loss for One Pass + Gradient: 93.40243060506472
+MSE Loss for Gradient: 38.62997705016378
+MSE Loss for One Pass + Gradient: 30.155881088321387
+MSE Loss for Gradient: 27.657948844100176
+MSE Loss for One Pass + Gradient: 20.75170833503548
+MSE Loss for Gradient: 21.041247279394184
+MSE Loss for One Pass + Gradient: 16.85346572193189
+MSE Loss for Gradient: 16.737963798514073
+MSE Loss for One Pass + Gradient: 14.721830794090929
+MSE Loss for Gradient: 13.939892617206496
+MSE Loss for One Pass + Gradient: 13.401309849351762
+MSE Loss for Gradient: 11.974274260498584
+MSE Loss for One Pass + Gradient: 12.319478208123764
+MSE Loss for Gradient: 10.595278418637303
+Round 5 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34777.436527601974
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34463.06303127036
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34132.9968030518
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33876.1007037423
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33710.73780172688
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33624.90136446011
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33596.922440156864
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33609.25829141581
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 3722.510131641969
+MSE Loss for Gradient: 186.01503620902537
+MSE Loss for One Pass + Gradient: 171.53779300764973
+MSE Loss for Gradient: 47.144710456212515
+MSE Loss for One Pass + Gradient: 43.52780952301482
+MSE Loss for Gradient: 32.766363853736316
+MSE Loss for One Pass + Gradient: 27.53984976103215
+MSE Loss for Gradient: 25.240327992209952
+MSE Loss for One Pass + Gradient: 21.97141083847452
+MSE Loss for Gradient: 19.686574022543383
+MSE Loss for One Pass + Gradient: 18.74568460402527
+MSE Loss for Gradient: 16.66213866385678
+MSE Loss for One Pass + Gradient: 16.363209934421466
+MSE Loss for Gradient: 14.489804718797211
+MSE Loss for One Pass + Gradient: 14.544941288512781
+MSE Loss for Gradient: 12.901692863789096
+Round 6 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34768.41853786893
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34429.62772490208
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34069.56402443375
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33788.25277837509
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33610.46430500105
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33518.38744211757
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33479.39910597191
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33471.908856292364
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15695.088607980937
+MSE Loss for Gradient: 148.38325397756788
+MSE Loss for One Pass + Gradient: 1141.636953749872
+MSE Loss for Gradient: 43.605535525189815
+MSE Loss for One Pass + Gradient: 83.32432703928562
+MSE Loss for Gradient: 32.41983614288049
+MSE Loss for One Pass + Gradient: 35.95458707166044
+MSE Loss for Gradient: 25.351741031792816
+MSE Loss for One Pass + Gradient: 26.18718301724631
+MSE Loss for Gradient: 20.619222053426316
+MSE Loss for One Pass + Gradient: 21.84004139481188
+MSE Loss for Gradient: 17.240737332342658
+MSE Loss for One Pass + Gradient: 18.811790024160697
+MSE Loss for Gradient: 14.81529053231259
+MSE Loss for One Pass + Gradient: 16.65906848144345
+MSE Loss for Gradient: 13.047611635185778
+Round 7 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34760.52476025796
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1:
+Loss: 34426.55693935088
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34078.16760646378
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33808.39055840662
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33637.177408525524
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33548.288266744945
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33511.54383638316
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33507.70041122022
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15736.504444303002
+MSE Loss for Gradient: 177.3937023681032
+MSE Loss for One Pass + Gradient: 531.1804789565264
+MSE Loss for Gradient: 49.296133356344654
+MSE Loss for One Pass + Gradient: 55.24261844990974
+MSE Loss for Gradient: 36.97639485517365
+MSE Loss for One Pass + Gradient: 28.139544813868124
+MSE Loss for Gradient: 28.206910002049526
+MSE Loss for One Pass + Gradient: 20.467324792142726
+MSE Loss for Gradient: 22.577058562527768
+MSE Loss for One Pass + Gradient: 16.422675053562795
+MSE Loss for Gradient: 18.603463560093658
+MSE Loss for One Pass + Gradient: 13.958910154838465
+MSE Loss for Gradient: 15.72755840527825
+MSE Loss for One Pass + Gradient: 12.264141887909034
+MSE Loss for Gradient: 13.612165153192578
+Round 8 complete.
+IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34769.95195660762
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34453.94591610857
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34116.57365659082
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33854.337041489074
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33685.79014598955
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33596.49264727314
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33561.17083160305
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33562.717462767134
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15695.75408688409
+MSE Loss for Gradient: 136.65145320996106
+MSE Loss for One Pass + Gradient: 14796.810440525769
+MSE Loss for Gradient: 37.287557496529594
+MSE Loss for One Pass + Gradient: 14077.806023553801
+MSE Loss for Gradient: 28.355131751548498
+MSE Loss for One Pass + Gradient: 13427.151593583825
+MSE Loss for Gradient: 22.783572384041268
+MSE Loss for One Pass + Gradient: 12827.114930050839
+MSE Loss for Gradient: 18.99782884026086
+MSE Loss for One Pass + Gradient: 12174.430077287945
+MSE Loss for Gradient: 16.24618682346365
+MSE Loss for One Pass + Gradient: 606.8493984106292
+MSE Loss for Gradient: 14.261562113388209
+MSE Loss for One Pass + Gradient: 103.61201625139752
+MSE Loss for Gradient: 12.753377207046157
+Round 9 complete.
+MARKED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34786.75521824715
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34478.5363950616
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34152.556976739346
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33895.5691355336
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33726.54641827432
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33637.02962861287
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33605.44660486561
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33614.43397773443
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15123.42522664913
+MSE Loss for Gradient: 153.38205071818456
+MSE Loss for One Pass + Gradient: 229.47801084925106
+MSE Loss for Gradient: 43.47409034941671
+MSE Loss for One Pass + Gradient: 42.42423815731961
+MSE Loss for Gradient: 31.56893851731281
+MSE Loss for One Pass + Gradient: 25.411984067581418
+MSE Loss for Gradient: 24.037899487414922
+MSE Loss for One Pass + Gradient: 19.759328329112613
+MSE Loss for Gradient: 19.102091977409348
+MSE Loss for One Pass + Gradient: 17.013735705921093
+MSE Loss for Gradient: 15.702461209721077
+MSE Loss for One Pass + Gradient: 15.27826078999904
+MSE Loss for Gradient: 13.399577819541504
+MSE Loss for One Pass + Gradient: 13.972567572944797
+MSE Loss for Gradient: 11.803562496171915
+Round 10 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34772.823695167855
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34429.322775978224
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34067.69993886117
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33790.37899874146
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33615.47039044306
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33523.26484555885
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33481.961313416454
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33470.2063988885
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15677.947559037719
+MSE Loss for Gradient: 149.17232091329052
+MSE Loss for One Pass + Gradient: 14788.69089174974
+MSE Loss for Gradient: 40.871316338614385
+MSE Loss for One Pass + Gradient: 14080.013951942963
+MSE Loss for Gradient: 30.14689234797249
+MSE Loss for One Pass + Gradient: 5118.17287471934
+MSE Loss for Gradient: 23.896120339503103
+MSE Loss for One Pass + Gradient: 113.1087923018735
+MSE Loss for Gradient: 19.793423410960894
+MSE Loss for One Pass + Gradient: 31.424346872570226
+MSE Loss for Gradient: 16.889523020702704
+MSE Loss for One Pass + Gradient: 23.927879391479784
+MSE Loss for Gradient: 14.760721119051567
+MSE Loss for One Pass + Gradient: 19.870834878077147
+MSE Loss for Gradient: 13.125392895520665
+Round 11 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34743.52303642876
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34352.81680018705
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 33948.56764078879
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33657.08059002709
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33492.071560988166
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33418.00314515734
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33390.09534879254
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33378.75020010613
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 1640.5761929026655
+MSE Loss for Gradient: 157.66267859399696
+MSE Loss for One Pass + Gradient: 154.28775318407466
+MSE Loss for Gradient: 39.38025818841807
+MSE Loss for One Pass + Gradient: 56.56634404588898
+MSE Loss for Gradient: 29.019066040116943
+MSE Loss for One Pass + Gradient: 38.916872243736464
+MSE Loss for Gradient: 22.3479678355637
+MSE Loss for One Pass + Gradient: 31.20570611177408
+MSE Loss for Gradient: 18.591068012973818
+MSE Loss for One Pass + Gradient: 26.392697713611778
+MSE Loss for Gradient: 15.951757564396248
+MSE Loss for One Pass + Gradient: 23.355295078027005
+MSE Loss for Gradient: 13.98573874068109
+MSE Loss for One Pass + Gradient: 20.553566306008506
+MSE Loss for Gradient: 12.499617097623297
+Round 12 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34773.699280680674
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34464.80421123911
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34141.87409679753
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33888.53565866658
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33722.4461442381
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33633.67643092757
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33600.6882696887
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33606.26259196275
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 718.2517072599926
+MSE Loss for Gradient: 166.08698754930393
+MSE Loss for One Pass + Gradient: 119.24112444462348
+MSE Loss for Gradient: 35.4321468248092
+MSE Loss for One Pass + Gradient: 54.70022017782449
+MSE Loss for Gradient: 25.17943986734882
+MSE Loss for One Pass + Gradient: 38.31673225107207
+MSE Loss for Gradient: 19.522244860781704
+MSE Loss for One Pass + Gradient: 30.2979542113886
+MSE Loss for Gradient: 16.304332640217616
+MSE Loss for One Pass + Gradient: 25.29651656596158
+MSE Loss for Gradient: 13.570152813455017
+MSE Loss for One Pass + Gradient: 21.734728819020383
+MSE Loss for Gradient: 11.008096512070638
+MSE Loss for One Pass + Gradient: 18.899431153480602
+MSE Loss for Gradient: 9.835167837323013
+Round 13 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34729.81763475306
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34329.245908683864
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 33919.44870569109
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33614.148344208596
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33437.57538459369
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33359.936171518966
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33334.14712366763
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33327.46356702651
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 2269.545254674494
+MSE Loss for Gradient: 179.63950451562204
+MSE Loss for One Pass + Gradient: 193.94548208012966
+MSE Loss for Gradient: 44.0192694271612
+MSE Loss for One Pass + Gradient: 54.39982854048914
+MSE Loss for Gradient: 28.937172248335088
+MSE Loss for One Pass + Gradient: 33.835425862970645
+MSE Loss for Gradient: 19.0499013586198
+MSE Loss for One Pass + Gradient: 26.90838607797773
+MSE Loss for Gradient: 14.026974512322223
+MSE Loss for One Pass + Gradient: 22.684209894190833
+MSE Loss for Gradient: 11.889982605843688
+MSE Loss for One Pass + Gradient: 19.29299044289693
+MSE Loss for Gradient: 10.421781561663636
+MSE Loss for One Pass + Gradient: 16.745201772656934
+MSE Loss for Gradient: 9.057371120736585
+Round 14 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34812.58469666211
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34563.66031481983
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34289.3643762852
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 34073.44425475785
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33937.30058355908
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33879.560512009295
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33887.90159237887
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33953.66112670368
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 1003.5110561846793
+MSE Loss for Gradient: 127.61641058742674
+MSE Loss for One Pass + Gradient: 151.42314304306078
+MSE Loss for Gradient: 34.52012253216043
+MSE Loss for One Pass + Gradient: 60.09212553633697
+MSE Loss for Gradient: 24.939439393482637
+MSE Loss for One Pass + Gradient: 37.1947803814864
+MSE Loss for Gradient: 19.330658166723502
+MSE Loss for One Pass + Gradient: 27.240799442650538
+MSE Loss for Gradient: 15.756070979780867
+MSE Loss for One Pass + Gradient: 21.72458544358681
+MSE Loss for Gradient: 13.362260171917384
+MSE Loss for One Pass + Gradient: 18.454150742679488
+MSE Loss for Gradient: 11.702366973892392
+MSE Loss for One Pass + Gradient: 16.141175716024488
+MSE Loss for Gradient: 10.49188306165731
+Round 15 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34746.57192826307
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34398.186376538986
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34045.6986225569
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33784.832504957274
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33625.144024687856
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33547.63247139459
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33524.623574737954
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33539.190020756054
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 1105.5617934633053
+MSE Loss for Gradient: 160.8604553415712
+MSE Loss for One Pass + Gradient: 114.10435762267356
+MSE Loss for Gradient: 49.30745389032387
+MSE Loss for One Pass + Gradient: 39.978108565661245
+MSE Loss for Gradient: 35.64806618941651
+MSE Loss for One Pass + Gradient: 27.475827856841263
+MSE Loss for Gradient: 27.257513984035526
+MSE Loss for One Pass + Gradient: 21.49598781412124
+MSE Loss for Gradient: 21.866942427862085
+MSE Loss for One Pass + Gradient: 17.829505378720874
+MSE Loss for Gradient: 17.985637004175572
+MSE Loss for One Pass + Gradient: 15.351286370288129
+MSE Loss for Gradient: 14.927248585063905
+MSE Loss for One Pass + Gradient: 13.619777589954436
+MSE Loss for Gradient: 12.291927115980943
+Round 16 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34779.00427750798
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34471.45309077691
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34150.70225251262
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33899.63672980446
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33739.71644651926
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33659.46334352379
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33637.872848767
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33659.233950673835
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15693.777044315204
+MSE Loss for Gradient: 135.4779363604274
+MSE Loss for One Pass + Gradient: 421.9374959147433
+MSE Loss for Gradient: 37.841695038509904
+MSE Loss for One Pass + Gradient: 65.34486486211694
+MSE Loss for Gradient: 27.07369947023606
+MSE Loss for One Pass + Gradient: 33.09752706474491
+MSE Loss for Gradient: 20.759734912180633
+MSE Loss for One Pass + Gradient: 24.01792061072687
+MSE Loss for Gradient: 16.728776165189164
+MSE Loss for One Pass + Gradient: 18.60505742701079
+MSE Loss for Gradient: 13.972366280532034
+MSE Loss for One Pass + Gradient: 15.190285169121008
+MSE Loss for Gradient: 12.074037986619398
+MSE Loss for One Pass + Gradient: 12.838491315073949
+MSE Loss for Gradient: 10.752163677612145
+Round 17 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34760.51513398745
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34401.40274813148
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34015.09069332921
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33718.16522008229
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33535.62372921979
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33445.415546569166
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33407.32565448883
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33393.91340336225
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15727.46850009241
+MSE Loss for Gradient: 137.91595028611832
+MSE Loss for One Pass + Gradient: 2052.5153672657516
+MSE Loss for Gradient: 39.233315403552496
+MSE Loss for One Pass + Gradient: 97.25996440375422
+MSE Loss for Gradient: 28.071698481634783
+MSE Loss for One Pass + Gradient: 29.786129551833948
+MSE Loss for Gradient: 21.365017333749332
+MSE Loss for One Pass + Gradient: 19.67716469952598
+MSE Loss for Gradient: 17.10974663439137
+MSE Loss for One Pass + Gradient: 15.864160981412773
+MSE Loss for Gradient: 14.254797102484211
+MSE Loss for One Pass + Gradient: 13.695601467566448
+MSE Loss for Gradient: 12.238764610056707
+MSE Loss for One Pass + Gradient: 12.201411101863734
+MSE Loss for Gradient: 10.835225678144706
+Round 18 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34755.33961123943
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34423.31323555948
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34071.00875853506
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33791.70037061859
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33609.08070329687
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33509.84300815567
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33463.18957674417
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33447.19392103347
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 1209.3808312581752
+MSE Loss for Gradient: 150.82045134523813
+MSE Loss for One Pass + Gradient: 162.89489775753114
+MSE Loss for Gradient: 46.001652800837796
+MSE Loss for One Pass + Gradient: 55.638295125186445
+MSE Loss for Gradient: 34.888081422386456
+MSE Loss for One Pass + Gradient: 32.19990888215992
+MSE Loss for Gradient: 27.43103009272064
+MSE Loss for One Pass + Gradient: 23.88549450986204
+MSE Loss for Gradient: 22.202622170287942
+MSE Loss for One Pass + Gradient: 19.763877045994946
+MSE Loss for Gradient: 18.370474398628982
+MSE Loss for One Pass + Gradient: 17.015694182846943
+MSE Loss for Gradient: 15.536190265867278
+MSE Loss for One Pass + Gradient: 15.194732031179651
+MSE Loss for Gradient: 13.556804275086034
+Round 19 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34774.56586889976
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34459.07800927026
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34129.581172440885
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33873.43394850199
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33710.8716483412
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33627.91842670292
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33603.273954431264
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33620.95424191461
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 908.5517015251403
+MSE Loss for Gradient: 173.48134502028475
+MSE Loss for One Pass + Gradient: 96.13625994086894
+MSE Loss for Gradient: 43.04310480700317
+MSE Loss for One Pass + Gradient: 35.51985951619997
+MSE Loss for Gradient: 31.971599383654596
+MSE Loss for One Pass + Gradient: 26.474745549267915
+MSE Loss for Gradient: 24.52726283554727
+MSE Loss for One Pass + Gradient: 22.08555405231916
+MSE Loss for Gradient: 19.518602591168193
+MSE Loss for One Pass + Gradient: 19.331813203923755
+MSE Loss for Gradient: 15.95094856874767
+MSE Loss for One Pass + Gradient: 17.29727355045105
+MSE Loss for Gradient: 13.148757599800941
+MSE Loss for One Pass + Gradient: 15.774115299119847
+MSE Loss for Gradient: 11.531554554284142
+Round 20 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34764.87259996708
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34428.056740958644
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34071.124690333905
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33796.16998580623
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33622.200471346616
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33530.8579532491
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33492.425951899764
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33485.25242705524
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 996.3159027789745
+MSE Loss for Gradient: 152.7759979162442
+MSE Loss for One Pass + Gradient: 115.42565094248872
+MSE Loss for Gradient: 43.06186439854745
+MSE Loss for One Pass + Gradient: 44.50486709180503
+MSE Loss for Gradient: 30.843586578721414
+MSE Loss for One Pass + Gradient: 31.466842807005566
+MSE Loss for Gradient: 23.624239936611556
+MSE Loss for One Pass + Gradient: 25.07631762097479
+MSE Loss for Gradient: 19.017358516824665
+MSE Loss for One Pass + Gradient: 21.182142806139833
+MSE Loss for Gradient: 15.896197929712159
+MSE Loss for One Pass + Gradient: 18.438386866057908
+MSE Loss for Gradient: 13.756000395766227
+MSE Loss for One Pass + Gradient: 16.433472560757014
+MSE Loss for Gradient: 12.263318609808454
+Round 21 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34762.43653180985
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34401.01172915713
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34008.033450466966
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33705.98389976753
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33525.44319897816
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33440.38259180388
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33406.35678940205
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33392.51930202733
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 12570.749210399217
+MSE Loss for Gradient: 147.2101312351136
+MSE Loss for One Pass + Gradient: 192.0014704544852
+MSE Loss for Gradient: 43.166972582904215
+MSE Loss for One Pass + Gradient: 40.150038440770075
+MSE Loss for Gradient: 30.816373814266424
+MSE Loss for One Pass + Gradient: 24.146864073547942
+MSE Loss for Gradient: 22.555710546640213
+MSE Loss for One Pass + Gradient: 18.67228437657216
+MSE Loss for Gradient: 18.032743694877485
+MSE Loss for One Pass + Gradient: 15.515473633080953
+MSE Loss for Gradient: 14.859085758411092
+MSE Loss for One Pass + Gradient: 13.41979499438667
+MSE Loss for Gradient: 12.25243609920211
+MSE Loss for One Pass + Gradient: 11.947778309905567
+MSE Loss for Gradient: 10.9237507238338
+Round 22 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34778.02908967526
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34455.67055094609
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34105.09344659459
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33826.70878880039
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33646.56491814962
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33548.78943434664
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33502.65098244303
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33485.98230325812
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15734.44130432666
+MSE Loss for Gradient: 134.0485771897058
+MSE Loss for One Pass + Gradient: 14804.25857169642
+MSE Loss for Gradient: 39.935238935409636
+MSE Loss for One Pass + Gradient: 2231.424569232761
+MSE Loss for Gradient: 28.641773615008976
+MSE Loss for One Pass + Gradient: 114.18253362429815
+MSE Loss for Gradient: 21.810568610606662
+MSE Loss for One Pass + Gradient: 29.99918087308998
+MSE Loss for Gradient: 17.535601517072937
+MSE Loss for One Pass + Gradient: 18.776614869051844
+MSE Loss for Gradient: 14.725850892220173
+MSE Loss for One Pass + Gradient: 14.537912576173024
+MSE Loss for Gradient: 12.796488031561399
+MSE Loss for One Pass + Gradient: 12.422946261888429
+MSE Loss for Gradient: 11.428478816194692
+Round 23 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34811.74332023998
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34568.208921388454
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34311.22352393792
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 34117.500969953035
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 34004.1317841298
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33971.82479516538
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 34013.713912489126
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 34121.65687104919
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 946.1676234876882
+MSE Loss for Gradient: 150.42849368589708
+MSE Loss for One Pass + Gradient: 107.18311269264628
+MSE Loss for Gradient: 39.71552183473157
+MSE Loss for One Pass + Gradient: 45.80580195825221
+MSE Loss for Gradient: 28.530300548400554
+MSE Loss for One Pass + Gradient: 32.040479371243826
+MSE Loss for Gradient: 22.052003946539944
+MSE Loss for One Pass + Gradient: 25.3167378777478
+MSE Loss for Gradient: 18.06068513275875
+MSE Loss for One Pass + Gradient: 21.13929670089235
+MSE Loss for Gradient: 15.323622728720599
+MSE Loss for One Pass + Gradient: 18.417006806410267
+MSE Loss for Gradient: 13.339233973160736
+MSE Loss for One Pass + Gradient: 16.45888802116757
+MSE Loss for Gradient: 11.9599508137331
+Round 24 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34755.62428480007
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34396.75618886095
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34016.75557438485
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33731.69192656836
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33561.26284382006
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33476.72820914271
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33439.501539414676
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33425.74000146291
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15705.681205352977
+MSE Loss for Gradient: 137.0564468909921
+MSE Loss for One Pass + Gradient: 1336.4273445887231
+MSE Loss for Gradient: 39.59241955833812
+MSE Loss for One Pass + Gradient: 82.08071622288344
+MSE Loss for Gradient: 29.156842636972126
+MSE Loss for One Pass + Gradient: 30.353465006800658
+MSE Loss for Gradient: 22.7055416222777
+MSE Loss for One Pass + Gradient: 19.576369848618384
+MSE Loss for Gradient: 18.581099669340357
+MSE Loss for One Pass + Gradient: 15.292680930889038
+MSE Loss for Gradient: 15.707279025948315
+MSE Loss for One Pass + Gradient: 12.768367749813072
+MSE Loss for Gradient: 13.62446412190242
+MSE Loss for One Pass + Gradient: 11.177951555697843
+MSE Loss for Gradient: 12.115480473630596
+Round 25 complete.
+IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34782.909872113516
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34471.07888607922
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34142.92928997028
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33894.613235421064
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33739.87526213635
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33660.95143450195
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33635.89822004809
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33650.329705325814
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15684.082442817644
+MSE Loss for Gradient: 139.13157310269588
+MSE Loss for One Pass + Gradient: 14794.505597631613
+MSE Loss for Gradient: 39.86624210839075
+MSE Loss for One Pass + Gradient: 1151.3178977070695
+MSE Loss for Gradient: 28.615963816307545
+MSE Loss for One Pass + Gradient: 182.22354218871382
+MSE Loss for Gradient: 21.829557539266652
+MSE Loss for One Pass + Gradient: 68.8526641733414
+MSE Loss for Gradient: 17.529794215965083
+MSE Loss for One Pass + Gradient: 44.140357391921334
+MSE Loss for Gradient: 14.675619872710028
+MSE Loss for One Pass + Gradient: 32.674443445791724
+MSE Loss for Gradient: 12.737183770286501
+MSE Loss for One Pass + Gradient: 25.82914611927775
+MSE Loss for Gradient: 11.39560559879351
+Round 26 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34740.61374250294
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34356.94384728669
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 33961.27793154247
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33675.49256500657
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33515.09673110405
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33442.15028138945
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33412.528305413165
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33399.50983602465
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 2371.3878430852265
+MSE Loss for Gradient: 163.0942389358182
+MSE Loss for One Pass + Gradient: 130.03411882418675
+MSE Loss for Gradient: 33.66773941080384
+MSE Loss for One Pass + Gradient: 42.104270272397436
+MSE Loss for Gradient: 21.806370924230666
+MSE Loss for One Pass + Gradient: 29.015319778199224
+MSE Loss for Gradient: 16.725600470810082
+MSE Loss for One Pass + Gradient: 22.871279579435942
+MSE Loss for Gradient: 14.075261717343688
+MSE Loss for One Pass + Gradient: 19.123886979598392
+MSE Loss for Gradient: 12.30929368770347
+MSE Loss for One Pass + Gradient: 16.736564990768443
+MSE Loss for Gradient: 11.06852793474926
+MSE Loss for One Pass + Gradient: 14.964779747561522
+MSE Loss for Gradient: 10.147352173166698
+Round 27 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34765.82930476133
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34423.64847821973
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34060.90902464281
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33784.64431827445
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33615.53336296769
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33528.07463847067
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33489.599997425255
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33479.31757054011
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 846.8744008707674
+MSE Loss for Gradient: 135.04906831304177
+MSE Loss for One Pass + Gradient: 122.25067146084534
+MSE Loss for Gradient: 44.22453910174128
+MSE Loss for One Pass + Gradient: 45.630365941050144
+MSE Loss for Gradient: 30.989894691230788
+MSE Loss for One Pass + Gradient: 32.06618897759962
+MSE Loss for Gradient: 22.770022908204613
+MSE Loss for One Pass + Gradient: 25.82554991026828
+MSE Loss for Gradient: 17.716458380578267
+MSE Loss for One Pass + Gradient: 22.178171850576646
+MSE Loss for Gradient: 14.42392783919163
+MSE Loss for One Pass + Gradient: 19.70088866833344
+MSE Loss for Gradient: 12.261770596177204
+MSE Loss for One Pass + Gradient: 17.97409188497893
+MSE Loss for Gradient: 10.784945236427127
+Round 28 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34769.444836733404
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34433.8372254156
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34069.80152044416
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33790.39722297527
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33614.907634905314
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33522.22084893066
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33481.01365051868
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33469.27139046589
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 987.6783272541734
+MSE Loss for Gradient: 144.21877050198336
+MSE Loss for One Pass + Gradient: 158.08663400266738
+MSE Loss for Gradient: 38.885704122711964
+MSE Loss for One Pass + Gradient: 72.12788620843705
+MSE Loss for Gradient: 28.66068456819351
+MSE Loss for One Pass + Gradient: 53.43834618757176
+MSE Loss for Gradient: 22.10884975579253
+MSE Loss for One Pass + Gradient: 43.66551116960286
+MSE Loss for Gradient: 17.731954297724762
+MSE Loss for One Pass + Gradient: 37.06785679368617
+MSE Loss for Gradient: 14.787106769726408
+MSE Loss for One Pass + Gradient: 32.085371592551645
+MSE Loss for Gradient: 12.755358667608176
+MSE Loss for One Pass + Gradient: 28.2420908582228
+MSE Loss for Gradient: 11.322452922886464
+Round 29 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34759.10205010025
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34408.48604063889
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34033.618215893395
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 33745.1802553255
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33568.23456445834
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33477.54815003964
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33436.432577289044
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33418.45379882283
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 15728.38565362833
+MSE Loss for Gradient: 134.3406701137466
+MSE Loss for One Pass + Gradient: 14811.644575556946
+MSE Loss for Gradient: 39.318707298517516
+MSE Loss for One Pass + Gradient: 13838.552832252057
+MSE Loss for Gradient: 27.685425531250715
+MSE Loss for One Pass + Gradient: 487.54563829905106
+MSE Loss for Gradient: 20.65983078484886
+MSE Loss for One Pass + Gradient: 68.92246708140524
+MSE Loss for Gradient: 16.214403692391585
+MSE Loss for One Pass + Gradient: 36.5381587922061
+MSE Loss for Gradient: 13.30427637271781
+MSE Loss for One Pass + Gradient: 26.306683073903958
+MSE Loss for Gradient: 11.327935245445987
+MSE Loss for One Pass + Gradient: 21.08367949451937
+MSE Loss for Gradient: 9.95950623725409
+Round 30 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
+Loss: 34803.603540717624
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 1: 
+Loss: 34561.1116079587
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 2: 
+Loss: 34292.83590396128
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 3: 
+Loss: 34074.69684765158
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 4: 
+Loss: 33929.40331602351
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 5: 
+Loss: 33859.782783215865
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 6: 
+Loss: 33854.633002272174
+MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 7: 
+Loss: 33903.07209555394
+One pass step completed. Testing gradient descent...
+MSE Loss for One Pass + Gradient: 1669.7464974308682
+MSE Loss for Gradient: 124.99358537134066
+MSE Loss for One Pass + Gradient: 138.77916260549515
+MSE Loss for Gradient: 34.86936677764991
+MSE Loss for One Pass + Gradient: 36.093087380349
+MSE Loss for Gradient: 24.786912267292458
+MSE Loss for One Pass + Gradient: 22.665525316483457
+MSE Loss for Gradient: 19.032241618764587
+MSE Loss for One Pass + Gradient: 18.084535176718507
+MSE Loss for Gradient: 15.452955072937591
+MSE Loss for One Pass + Gradient: 15.496786791157284
+MSE Loss for Gradient: 13.09711487836676
+MSE Loss for One Pass + Gradient: 13.836062273244407
+MSE Loss for Gradient: 11.457776602547398
+MSE Loss for One Pass + Gradient: 12.667163730633124
+MSE Loss for Gradient: 10.298603001861382
+Round 31 complete.
+NOT IMPROVED
+==========================================================================================================================================================================================
