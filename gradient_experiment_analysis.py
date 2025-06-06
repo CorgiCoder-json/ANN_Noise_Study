@@ -1,3 +1,7 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def open_logs(fpath):
     round_results = []
     with open(fpath, 'rt') as file:
@@ -16,7 +20,7 @@ def open_logs(fpath):
 
 if __name__ == "__main__":
     logs = open_logs("./regression/reports/gradient_experimental_logs.txt")
-    print(logs)
+    print(len(logs))
     imperfection_tracker = 0
     wierd_tracker = 0
     no_takeover_tracker = 0
@@ -31,4 +35,12 @@ if __name__ == "__main__":
             continue
     print(f"There are {imperfection_tracker} imperfections, which means that in {((len(logs)-imperfection_tracker)/len(logs)) * 100}% of cases, there is improvement")
     print(f"There are {wierd_tracker} wierd results, and {no_takeover_tracker} no improvement results.")
-    
+    loss_stats = pd.read_csv("D:\\pass_gradient_exp\\stats.csv")
+    print(loss_stats)
+    for i in range(len(logs)):
+        if logs[i] == 1 or logs[i] == 2:
+            loss_stats.drop(i, axis=0, inplace=True)
+    print(loss_stats)
+    print(loss_stats["percent"].to_numpy())
+    sns.histplot(loss_stats, x="percent", kde=True).set_title("Percent Improvement Distribution")
+    plt.show()

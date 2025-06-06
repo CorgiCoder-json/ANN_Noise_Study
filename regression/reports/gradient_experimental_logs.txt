@@ -754,7 +754,7 @@ MSE Loss for Gradient: 24.940178377417265
 MSE Loss for One Pass + Gradient: 21.024691492122248
 MSE Loss for Gradient: 23.658763155758642
 Round 21 complete.
-IMRPOVED
+IMPROVED
 ==========================================================================================================================================================================================
 MSE OF THE TRAINED MODEL AFTER TRAINING ROUND 0: 
 Loss: 34749.1657365607

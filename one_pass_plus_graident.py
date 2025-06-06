@@ -36,7 +36,7 @@ if __name__ == "__main__":
     trained_copy_loss = []
     losses = []
     loss_fn = nn.MSELoss()
-    model_string = '100|200->relu->200|150->relu->150|1'
+    model_string = '100|200->silu->200|150->relu->150|1'
     for j in range(32):
         temp_model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()}))
         model_copy = copy.deepcopy(temp_model)
