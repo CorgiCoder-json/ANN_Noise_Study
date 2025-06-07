@@ -78,12 +78,22 @@ def convert_to_weight(data: np.ndarray, volitility: float, total_data_size: int,
     """
     return np.sign(data) * ((decay_constant(step, total_data_size) * scaled_weight(data))) * volitility
 
-def train_model(model, dataset: pd.DataFrame, model_str, device):
+def get_acitvations(model_str) -> list[str]:
+    split_str = model_str.split('->')
+    activation_functions = []
+    for string in split_str:
+        if "|" in string:
+            continue
+        else:
+            activation_functions.append(string)
+    return activation_functions
+
+def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activation):
     global global_device
     model.eval()
     with torch.no_grad():
         num_rows = len(dataset)
-        v = 0.00005
+        v = 0.00004
 
         #Extract the weights
         model_copy = copy.deepcopy(model.cpu())
@@ -107,12 +117,13 @@ def train_model(model, dataset: pd.DataFrame, model_str, device):
         # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
 
         #Step 1: move the data into the weight dimension
+        activations = get_acitvations(model_str)
         for i, item in enumerate(x):
             new_item = item
             for j, weight in enumerate(weights):
                 temp = torch.from_numpy(np.dot(weight, new_item) + biases[j])
-                if j != 2:
-                    new_item = nn.functional.silu(temp).numpy()
+                if j < len(activations):
+                    new_item = str_to_activation[activations[j]](temp).numpy()
                 result_sets[j].append(new_item)
 
         #Step 2: convert all of the data into zscores for their respective columns
@@ -126,8 +137,8 @@ def train_model(model, dataset: pd.DataFrame, model_str, device):
         
         #Step 3: convert the zscores into delta weights
         #Step 4: apply the delta weights to ALL neurons in the layer
-        for i, set in enumerate(converted_sets):
-            for j, row in enumerate(set):
+        for i, item_set in enumerate(converted_sets):
+            for row in item_set:
                 if np.isnan(row.sum()):
                     row = np.nan_to_num(row)
                 calculated_weights = convert_to_weight(row, v, num_rows, j)
@@ -155,10 +166,11 @@ if __name__ == "__main__":
     percent_improvements = []
     trained_min_loss = []
     losses = []
-    model_string = '100|200->silu->200|150->relu->150|1'
+    model_string = '100|200->silu->200|150->silu->150|1'
+    string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     for j in range(1):
-        temp_model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(global_device)
-        trained_model = train_model_dropout(temp_model, dataset, model_string, global_device)
+        temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to(global_device)
+        trained_model = train_model(temp_model, dataset, model_string, global_device, string_to_activation)
         min_acc = np.inf
         trained_rounds = 0
         minimum_model: NetworkSkeleton = NetworkSkeleton([])
@@ -172,7 +184,7 @@ if __name__ == "__main__":
                 minimum_model = trained_model
                 min_acc = acc
                 trained_rounds = i
-            trained_model = train_model_dropout(trained_model, dataset, model_string, global_device)
+            trained_model = train_model(trained_model, dataset, model_string, global_device, string_to_activation)
         untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
         trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
         #save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)
