@@ -38,7 +38,7 @@ if __name__ == "__main__":
         trained_copy_loss = []
         losses = []
         loss_fn = nn.MSELoss()
-        model_string = '100|200->relu->200|150->relu->150|1'
+        model_string = '100|200->silu->200|150->silu->150|1'
         string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
         for j in range(32):
             temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation))
@@ -49,7 +49,7 @@ if __name__ == "__main__":
             min_acc = np.inf
             trained_rounds = 0
             minimum_model: NetworkSkeleton = NetworkSkeleton([])
-            save_model_parameters(temp_model, model_string, f'base_round_{j}', 'D:\\pass_gradient_exp\\regression_test_1', global_device)
+            save_model_parameters(temp_model, model_string, f'base_round_{j}', 'D:\\pass_gradient_exp\\regression_test_3', global_device)
             for i in range(8):
                 file.write(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: \n")
                 print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
@@ -76,8 +76,8 @@ if __name__ == "__main__":
                 acc_copy = test(data_loader_test, model_copy, loss_fn, device=global_device)
                 file.write(f"MSE Loss for Gradient: {acc_copy}\n")
                 print(f"MSE Loss for Gradient: {acc_copy}")
-            save_model_parameters(minimum_model, model_string, f'one_pass_grad_round_{j}', 'D:\\pass_gradient_exp\\regression_test_1', global_device)
-            save_model_parameters(model_copy, model_string, f'just_grad_round_{j}', 'D:\\pass_gradient_exp\\regression_test_1', global_device)
+            save_model_parameters(minimum_model, model_string, f'one_pass_grad_round_{j}', 'D:\\pass_gradient_exp\\regression_test_3', global_device)
+            save_model_parameters(model_copy, model_string, f'just_grad_round_{j}', 'D:\\pass_gradient_exp\\regression_test_3', global_device)
             min_loss = test(data_loader_test, minimum_model, loss_fn, global_device)
             trained_min_loss.append(min_loss)
             copy_loss = test(data_loader_test, model_copy, loss_fn, device=global_device)
@@ -89,6 +89,6 @@ if __name__ == "__main__":
         gathered_data = pd.DataFrame({"pass_grad": trained_min_loss, "grad": trained_copy_loss, "percent": percent_improvements})
         gathered_data["differences"] = gathered_data["grad"] - gathered_data["pass_grad"] 
         sns.histplot(gathered_data, x="percent", kde=True).set_title("Percent Improvements")
-        gathered_data.to_csv("D:\\pass_gradient_exp\\regression_test_1\\stats.csv", index=False)
+        gathered_data.to_csv("D:\\pass_gradient_exp\\regression_test_3\\stats.csv", index=False)
         plt.show()
         
