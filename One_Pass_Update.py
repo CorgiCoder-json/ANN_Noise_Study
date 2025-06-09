@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from model_utils import NetworkSkeleton, display_network, create_layers, save_model_parameters, test
 import math
 import seaborn as sns
-from dropout_pass_update import train_model_dropout
+from dropout_pass_update import train_model_dropout, train_model_one_loop
 
 global_device = 'cuda'
 
@@ -88,12 +88,12 @@ def get_acitvations(model_str) -> list[str]:
             activation_functions.append(string)
     return activation_functions
 
-def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activation):
+def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activation, v):
     global global_device
+    total_iters = 0
     model.eval()
     with torch.no_grad():
         num_rows = len(dataset)
-        v = 0.00004
 
         #Extract the weights
         model_copy = copy.deepcopy(model.cpu())
@@ -121,15 +121,17 @@ def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activati
         for i, item in enumerate(x):
             new_item = item
             for j, weight in enumerate(weights):
-                temp = torch.from_numpy(np.dot(weight, new_item) + biases[j])
+                new_item = torch.from_numpy(np.dot(weight, new_item) + biases[j])
                 if j < len(activations):
-                    new_item = str_to_activation[activations[j]](temp).numpy()
+                    new_item = str_to_activation[activations[j]](new_item).numpy()
                 result_sets[j].append(new_item)
+                total_iters += 1
 
         #Step 2: convert all of the data into zscores for their respective columns
         converted_sets = []
         for result in result_sets:
             converted_sets.append(zscore(result, axis=0))
+            total_iters += 1
         
         #pop the final row and add the initial set
         converted_sets.pop()
@@ -142,7 +144,8 @@ def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activati
                 if np.isnan(row.sum()):
                     row = np.nan_to_num(row)
                 calculated_weights = convert_to_weight(row, v, num_rows, j)
-                weights[i] += calculated_weights      
+                weights[i] += calculated_weights
+                total_iters += 1      
 
         #Step 5: reapply the weights to a new model and return
         index = 0
@@ -154,14 +157,20 @@ def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activati
                 continue
         return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
         return_model.load_state_dict(model_copy.state_dict())
+        print(f"The standard train model algorithm had {total_iters} iterations")
         return return_model
 
 def get_percent_imporvement(start_loss, min_loss):
     return (math.fabs(start_loss - min_loss) / start_loss) * 100.0
 
 if __name__ == "__main__":
-    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
-    formatted_data = GeneratedDataset(dataset[dataset.columns[dataset.columns != 'y']].to_numpy(), dataset[dataset.columns[dataset.columns == 'y']].to_numpy())
+    imp_dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
+    x_vals = imp_dataset[imp_dataset.columns[imp_dataset.columns != 'y']].to_numpy()
+    y_vals = imp_dataset[imp_dataset.columns[imp_dataset.columns == 'y']].to_numpy()
+    min_ratio = 0.2
+    dataset = pd.DataFrame(x_vals[int(len(x_vals)*min_ratio):])
+    dataset["y"] = y_vals[int(len(y_vals)*min_ratio):]
+    formatted_data = GeneratedDataset(x_vals[:int(len(x_vals)*min_ratio)], y_vals[:int(len(y_vals)*min_ratio)])
     data_loader = DataLoader(formatted_data)
     percent_improvements = []
     trained_min_loss = []
@@ -170,12 +179,15 @@ if __name__ == "__main__":
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     for j in range(1):
         temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to(global_device)
-        trained_model = train_model(temp_model, dataset, model_string, global_device, string_to_activation)
+        trained_model = train_model_one_loop(temp_model, dataset, model_string, global_device, string_to_activation, 0.00004)
         min_acc = np.inf
         trained_rounds = 0
         minimum_model: NetworkSkeleton = NetworkSkeleton([])
         #save_model_parameters(temp_model, '100|128->relu->128|128->relu->128|1', f'pre_round_{j}', 'D:\\regression', global_device)
-        for i in range(8):
+        steps = 8
+        for i in range(steps):
+            #volitility = math.exp(-1.0*(i+1.0)/6.0)*0.00004
+            volitility = 0.00004
             print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
             acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
             print(f"Loss: {acc}")
@@ -184,7 +196,7 @@ if __name__ == "__main__":
                 minimum_model = trained_model
                 min_acc = acc
                 trained_rounds = i
-            trained_model = train_model(trained_model, dataset, model_string, global_device, string_to_activation)
+            trained_model = train_model_one_loop(trained_model, dataset, model_string, global_device, string_to_activation, volitility)
         untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
         trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
         #save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)
@@ -204,8 +216,8 @@ if __name__ == "__main__":
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.show()
-    #temp.to_csv("D:\\percentage_change.csv")
-    #temp2.to_csv("D:\\min_rounds.csv")
-    # sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
+    # temp.to_csv("regression\\reports\\percentage_change.csv")
+    # temp2.to_csv("regression\\reports\\min_rounds.csv")
+    sns.histplot(temp, x='percentages', kde=True).set_title("Percent Change between untrained and Trained netowrks")
     # sns.histplot(temp2, x='rounds', kde=True).set_title("Rounds to meet minimum loss")
-    # plt.show()
+    plt.show()

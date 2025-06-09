@@ -45,7 +45,7 @@ if __name__ == "__main__":
             model_copy = copy.deepcopy(temp_model)
             model_copy.to(global_device)
             temp_model.to(global_device)
-            trained_model = train_model(temp_model, dataset, model_string, global_device, string_to_activation)
+            trained_model = train_model(temp_model, dataset, model_string, global_device, string_to_activation, 0.00004)
             min_acc = np.inf
             trained_rounds = 0
             minimum_model: NetworkSkeleton = NetworkSkeleton([])
@@ -62,7 +62,7 @@ if __name__ == "__main__":
                     trained_model.to(global_device)
                     min_acc = acc
                     trained_rounds = i
-                trained_model = train_model(trained_model, dataset, model_string, global_device, string_to_activation)
+                trained_model = train_model(trained_model, dataset, model_string, global_device, string_to_activation, 0.00004)
             file.write("One pass step completed. Testing gradient descent...\n")
             print("One pass step completed. Testing gradient descent...")
             minimum_optim = torch.optim.SGD(minimum_model.parameters(), lr=1e-5)
