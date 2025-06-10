@@ -21,7 +21,7 @@ import math
 import seaborn as sns
 from dropout_pass_update import train_model_dropout, train_model_one_loop
 
-global_device = 'cuda'
+global_device = 'cpu'
 
 class GeneratedDataset(Dataset):
     def __init__(self, x_data, y_data):
@@ -140,7 +140,7 @@ def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activati
         #Step 3: convert the zscores into delta weights
         #Step 4: apply the delta weights to ALL neurons in the layer
         for i, item_set in enumerate(converted_sets):
-            for row in item_set:
+            for j, row in enumerate(item_set):
                 if np.isnan(row.sum()):
                     row = np.nan_to_num(row)
                 calculated_weights = convert_to_weight(row, v, num_rows, j)

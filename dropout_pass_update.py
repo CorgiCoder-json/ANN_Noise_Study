@@ -11,6 +11,17 @@ import random
 import pandas as pd
 from scipy.stats import zscore
 from model_utils import NetworkSkeleton, create_layers
+from torch.utils.data import DataLoader, Dataset
+import torch.nn as nn
+
+class GeneratedDataset(Dataset):
+    def __init__(self, x_data, y_data):
+        self.x = copy.deepcopy(x_data)
+        self.y = copy.deepcopy(y_data)
+    def __len__(self):
+        return len(self.x)
+    def __getitem__(self, index):
+        return self.x[index], np.float32(self.y[index])
 
 def decay_constant(step: int, total_data_size: int):
     return np.exp(-1 * (1/total_data_size) * step)
@@ -111,6 +122,7 @@ def train_model_dropout(model, dataset: pd.DataFrame, model_str, device, drop_ou
 
 def train_model_one_loop(model, dataset: pd.DataFrame, model_str, device, str_to_activation, v):
     global global_device
+    total_iters = 0
     model.eval()
     with torch.no_grad():
         num_rows = len(dataset)
@@ -120,7 +132,6 @@ def train_model_one_loop(model, dataset: pd.DataFrame, model_str, device, str_to
         data_copy = copy.deepcopy(dataset)
         weights = []
         biases = []
-        result_sets = [[], [], []]
         for item in model_copy.state_dict():
             if item[-6:] == "weight":
                 weights.append(model_copy.state_dict()[item].numpy())
@@ -147,6 +158,7 @@ def train_model_one_loop(model, dataset: pd.DataFrame, model_str, device, str_to
                 if j < len(activations):
                     new_item = str_to_activation[activations[j]](new_item).numpy()
                 weights[j] += delta_weights
+                total_iters += 1
 
         #Step 5: reapply the weights to a new model and return
         index = 0
@@ -158,4 +170,79 @@ def train_model_one_loop(model, dataset: pd.DataFrame, model_str, device, str_to
                 continue
         return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
         return_model.load_state_dict(model_copy.state_dict())
+        print(f"The train model algorithm  using only oen loop had {total_iters} iterations")
         return return_model
+    
+def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, str_to_activation, v):
+    global global_device
+    total_iters = 0
+    model.eval()
+    with torch.no_grad():
+        num_rows = len(dataset)
+
+        #Extract the weights
+        model_copy = copy.deepcopy(model.cpu())
+        data_copy = copy.deepcopy(dataset)
+        result_sets = []
+        weights = []
+        model.to(device)
+
+        #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
+        data_copy["z_answers"] = zscore(data_copy['y'])
+        data_copy["z_answers"] = data_copy['z_answers'].abs()
+        sorted_data = data_copy.sort_values(by='z_answers', ascending=True)
+        x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+        # data_copy = data_copy.sample(frac=1)
+        # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
+
+        #Step 1: move the data into the weight dimension
+        is_active = False
+        result = torch.from_numpy(x).type(torch.float)
+        for layer in model_copy.layers:
+            result = layer(result)
+            if not is_active:
+                weights.append(layer.weight)
+                is_active = True
+            else:
+                result_sets.append(result)
+                is_active = False
+
+        #Step 2: convert all of the data into zscores for their respective columns
+        converted_sets = []
+        for result in result_sets:
+            converted_sets.append(zscore(result, axis=0))
+        converted_sets.insert(0, zscore(x, axis=0))   
+        
+        #Step 3: convert the zscores into delta weights
+        #Step 4: apply the delta weights to ALL neurons in the layer
+        for i, item_set in enumerate(converted_sets):
+            for j, row in enumerate(item_set):
+                if np.isnan(row.sum()):
+                    row = np.nan_to_num(row)
+                calculated_weights = convert_to_weight(row, v, num_rows, j)
+                weights[i] += calculated_weights
+
+        #Step 5: reapply the weights to a new model and return
+        index = 0
+        for item in model_copy.state_dict():
+            if item[-6:] == "weight":
+                model_copy.state_dict()[item] = weights[index]
+                index += 1
+        return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
+        return_model.load_state_dict(model_copy.state_dict())
+        return return_model
+
+if __name__ == "__main__":
+    imp_dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
+    x_vals = imp_dataset[imp_dataset.columns[imp_dataset.columns != 'y']].to_numpy()
+    y_vals =  imp_dataset[imp_dataset.columns[imp_dataset.columns == 'y']].to_numpy()
+    dataset = pd.DataFrame(x_vals[int(len(x_vals)*.2):])
+    dataset["y"] = y_vals[int(len(y_vals)*.2):]
+    formatted_data_train = GeneratedDataset(x_vals[int(len(x_vals)*.2):], y_vals[int(len(y_vals)*.2):])
+    formatted_data_test = GeneratedDataset(x_vals[:int(len(x_vals)*.2)], y_vals[:int(len(y_vals)*.2)])
+    data_loader_train = DataLoader(formatted_data_train)
+    data_loader_test = DataLoader(formatted_data_test)
+    model_string = '100|200->silu->200|150->silu->150|1'
+    string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
+    temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to('cpu')
+    train_model_torch_boost(temp_model, dataset, model_string, 'cpu', string_to_activation, 0.00004)
