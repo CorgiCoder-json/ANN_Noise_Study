@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from model_utils import NetworkSkeleton, display_network, create_layers, save_model_parameters, test
 import math
 import seaborn as sns
-from dropout_pass_update import train_model_dropout, train_model_one_loop
+from dropout_pass_update import train_model_dropout, train_model_one_loop, train_model_torch_boost
 
 global_device = 'cpu'
 
@@ -175,11 +175,11 @@ if __name__ == "__main__":
     percent_improvements = []
     trained_min_loss = []
     losses = []
-    model_string = '100|200->silu->200|150->silu->150|1'
+    model_string = '100|200->relu->200|150->relu->150|1'
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     for j in range(1):
         temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to(global_device)
-        trained_model = train_model_one_loop(temp_model, dataset, model_string, global_device, string_to_activation, 0.00004)
+        trained_model = train_model_torch_boost(temp_model, dataset, model_string, global_device, 0.00006, 20)
         min_acc = np.inf
         trained_rounds = 0
         minimum_model: NetworkSkeleton = NetworkSkeleton([])
@@ -187,7 +187,7 @@ if __name__ == "__main__":
         steps = 8
         for i in range(steps):
             #volitility = math.exp(-1.0*(i+1.0)/6.0)*0.00004
-            volitility = 0.00004
+            volitility = 0.00006
             print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
             acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
             print(f"Loss: {acc}")
@@ -196,7 +196,7 @@ if __name__ == "__main__":
                 minimum_model = trained_model
                 min_acc = acc
                 trained_rounds = i
-            trained_model = train_model_one_loop(trained_model, dataset, model_string, global_device, string_to_activation, volitility)
+            trained_model = train_model_torch_boost(trained_model, dataset, model_string, global_device, volitility, 20)
         untrained_acc = test(data_loader, temp_model, nn.MSELoss(), device=global_device)
         trained_min_acc = test(data_loader, minimum_model, nn.MSELoss(), device=global_device)
         #save_model_parameters(minimum_model, '100|128->relu->128|128->relu->128|1', f'post_round_{j}', 'D:\\regression', global_device)

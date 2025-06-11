@@ -53,7 +53,10 @@ def one_epoch_test_random_model(train_data, train_data_loader):
         train(train_data_loader, model_copy, nn.MSELoss(), torch.optim.SGD(model_copy.parameters(), lr=1e-5), 'cpu')
         end_time = time.time()
         gradient_method.append(end_time - start_time)
-    return my_method, gradient_method   
+    return my_method, gradient_method
+
+def ramp_data_random_model():
+    pass   
 
 if __name__ == "__main__":
     imp_dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")

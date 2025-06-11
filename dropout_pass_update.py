@@ -193,7 +193,7 @@ def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, v, 
         data_copy["z_answers"] = data_copy['z_answers'].abs()
         sorted_data = data_copy.sort_values(by='z_answers', ascending=True)
         x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
-        y_vals  =sorted_data.loc[:, sorted_data.columns == 'y'].to_numpy()
+        y_vals = sorted_data.loc[:, sorted_data.columns == 'y'].to_numpy()
         # data_copy = data_copy.sample(frac=1)
         # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
 
@@ -210,18 +210,16 @@ def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, v, 
                 except:
                     break
                 try:
-                    np.append(result_sets[index], result, axis=0)
+                    result_sets[index] = np.append(result_sets[index], result, axis=0)
                 except Exception as e:
                     result_sets.append(result)
-            index += 1
-                    
+            index += 1               
 
         #Step 2: convert all of the data into zscores for their respective columns
-        converted_sets = []
+        converted_sets = [zscore(x, axis=0)]
         for result in result_sets:
             converted_sets.append(zscore(result, axis=0))
-        converted_sets.insert(0, zscore(x, axis=0))   
-        
+            
         #Step 3: convert the zscores into delta weights
         #Step 4: apply the delta weights to ALL neurons in the layer
         for i, item_set in enumerate(converted_sets):
@@ -255,5 +253,5 @@ if __name__ == "__main__":
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to('cpu')
     print(test(data_loader_test, temp_model, nn.MSELoss(), 'cpu'))
-    new_model = train_model_torch_boost(temp_model, dataset, model_string, 'cpu', 0.0004, 1)
+    new_model = train_model_torch_boost(temp_model, dataset, model_string, 'cpu', 0.00004, 20)
     print(test(data_loader_test, new_model, nn.MSELoss(), 'cpu'))
