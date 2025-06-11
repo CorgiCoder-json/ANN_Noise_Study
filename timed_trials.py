@@ -46,7 +46,7 @@ def one_epoch_test_random_model(train_data, train_data_loader):
         model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()}))
         model_copy = copy.deepcopy(model)
         start_time = time.time()
-        train_model_torch_boost(model, train_data, model_string, 'cpu',{'relu': nn.ReLU(), 'silu': nn.SiLU()}, 0.00004)
+        train_model_torch_boost(model, train_data, model_string, 'cpu', 0.00004, 100)
         end_time = time.time()
         my_method.append(end_time - start_time)
         start_time = time.time()
@@ -63,6 +63,6 @@ if __name__ == "__main__":
     dataset["y"] = y_vals[int(len(y_vals)*.2):]
     formatted_data_train = GeneratedDataset(x_vals[int(len(x_vals)*.2):], y_vals[int(len(y_vals)*.2):])
     formatted_data_test = GeneratedDataset(x_vals[:int(len(x_vals)*.2)], y_vals[:int(len(y_vals)*.2)])
-    data_loader_train = DataLoader(formatted_data_train)
-    data_loader_test = DataLoader(formatted_data_test)
+    data_loader_train = DataLoader(formatted_data_train, batch_size=100)
+    data_loader_test = DataLoader(formatted_data_test, batch_size=100)
     print(one_epoch_test_random_model(dataset, data_loader_train))

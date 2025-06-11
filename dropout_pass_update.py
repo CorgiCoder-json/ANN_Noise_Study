@@ -3,6 +3,7 @@ Created: 6/4/2025
 
 Purpose: Add a dropout parmeter p to the onepass update system
 """
+from hmac import new
 import numpy as np
 import torch
 import torch.nn as nn
@@ -10,7 +11,7 @@ import copy
 import random
 import pandas as pd
 from scipy.stats import zscore
-from model_utils import NetworkSkeleton, create_layers
+from model_utils import NetworkSkeleton, create_layers, test
 from torch.utils.data import DataLoader, Dataset
 import torch.nn as nn
 
@@ -173,7 +174,7 @@ def train_model_one_loop(model, dataset: pd.DataFrame, model_str, device, str_to
         print(f"The train model algorithm  using only oen loop had {total_iters} iterations")
         return return_model
     
-def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, str_to_activation, v):
+def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, v, batch_size):
     global global_device
     total_iters = 0
     model.eval()
@@ -192,20 +193,28 @@ def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, str
         data_copy["z_answers"] = data_copy['z_answers'].abs()
         sorted_data = data_copy.sort_values(by='z_answers', ascending=True)
         x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
+        y_vals  =sorted_data.loc[:, sorted_data.columns == 'y'].to_numpy()
         # data_copy = data_copy.sample(frac=1)
         # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
 
         #Step 1: move the data into the weight dimension
-        is_active = False
-        result = torch.from_numpy(x).type(torch.float)
-        for layer in model_copy.layers:
-            result = layer(result)
-            if not is_active:
-                weights.append(layer.weight)
-                is_active = True
-            else:
-                result_sets.append(result)
-                is_active = False
+        index = 0
+        temp_layers = model_copy.layers
+        for layer in range(0,len(temp_layers),2):
+            new_data = result_sets[-1] if len(result_sets) > 0 else x
+            loader = DataLoader(GeneratedDataset(new_data, y_vals), batch_size=batch_size)
+            weights.append(temp_layers[layer].weight.numpy())
+            for X, y in loader:
+                try:
+                    result = temp_layers[layer+1](temp_layers[layer](X.type(torch.float))).numpy()
+                except:
+                    break
+                try:
+                    np.append(result_sets[index], result, axis=0)
+                except Exception as e:
+                    result_sets.append(result)
+            index += 1
+                    
 
         #Step 2: convert all of the data into zscores for their respective columns
         converted_sets = []
@@ -245,4 +254,6 @@ if __name__ == "__main__":
     model_string = '100|200->silu->200|150->silu->150|1'
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to('cpu')
-    train_model_torch_boost(temp_model, dataset, model_string, 'cpu', string_to_activation, 0.00004)
+    print(test(data_loader_test, temp_model, nn.MSELoss(), 'cpu'))
+    new_model = train_model_torch_boost(temp_model, dataset, model_string, 'cpu', 0.0004, 1)
+    print(test(data_loader_test, new_model, nn.MSELoss(), 'cpu'))
