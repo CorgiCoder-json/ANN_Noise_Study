@@ -155,7 +155,7 @@ def train_model(model, dataset: pd.DataFrame, model_str, device, str_to_activati
                 index += 1
             else:
                 continue
-        return_model = NetworkSkeleton(create_layers(model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
+        return_model = NetworkSkeleton(create_layers(model_str, str_to_activation)).to(device)
         return_model.load_state_dict(model_copy.state_dict())
         print(f"The standard train model algorithm had {total_iters} iterations")
         return return_model

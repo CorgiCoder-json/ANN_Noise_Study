@@ -184,22 +184,20 @@ def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, v, 
         #Extract the weights
         model_copy = copy.deepcopy(model.cpu())
         data_copy = copy.deepcopy(dataset)
-        result_sets = []
+        x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
+        y_vals = data_copy.loc[:, data_copy.columns == 'y'].to_numpy()
+        result_sets = [zscore(x, axis=0)]
         weights = []
         model.to(device)
 
         #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
-        data_copy["z_answers"] = zscore(data_copy['y'])
-        data_copy["z_answers"] = data_copy['z_answers'].abs()
-        sorted_data = data_copy.sort_values(by='z_answers', ascending=True)
-        x = sorted_data.loc[:, sorted_data.columns != 'y'].drop(["z_answers"], axis=1).to_numpy()
-        y_vals = sorted_data.loc[:, sorted_data.columns == 'y'].to_numpy()
         # data_copy = data_copy.sample(frac=1)
         # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
 
         #Step 1: move the data into the weight dimension
-        index = 0
+        index = 1
         temp_layers = model_copy.layers
+        end_flag = False
         for layer in range(0,len(temp_layers),2):
             new_data = result_sets[-1] if len(result_sets) > 0 else x
             loader = DataLoader(GeneratedDataset(new_data, y_vals), batch_size=batch_size)
@@ -207,22 +205,20 @@ def train_model_torch_boost(model, dataset: pd.DataFrame, model_str, device, v, 
             for X, y in loader:
                 try:
                     result = temp_layers[layer+1](temp_layers[layer](X.type(torch.float))).numpy()
-                except:
+                except Exception as e:
+                    end_flag = True
                     break
                 try:
                     result_sets[index] = np.append(result_sets[index], result, axis=0)
                 except Exception as e:
                     result_sets.append(result)
+            if not end_flag:
+                result_sets[index] = zscore(result_sets[index])
             index += 1               
-
-        #Step 2: convert all of the data into zscores for their respective columns
-        converted_sets = [zscore(x, axis=0)]
-        for result in result_sets:
-            converted_sets.append(zscore(result, axis=0))
             
         #Step 3: convert the zscores into delta weights
         #Step 4: apply the delta weights to ALL neurons in the layer
-        for i, item_set in enumerate(converted_sets):
+        for i, item_set in enumerate(result_sets):
             for j, row in enumerate(item_set):
                 if np.isnan(row.sum()):
                     row = np.nan_to_num(row)
@@ -245,6 +241,10 @@ if __name__ == "__main__":
     y_vals =  imp_dataset[imp_dataset.columns[imp_dataset.columns == 'y']].to_numpy()
     dataset = pd.DataFrame(x_vals[int(len(x_vals)*.2):])
     dataset["y"] = y_vals[int(len(y_vals)*.2):]
+    dataset["z_answers"] = zscore(dataset['y'])
+    dataset["z_answers"] = dataset['z_answers'].abs()
+    sorted_data = dataset.sort_values(by='z_answers', ascending=True).drop(["z_answers"], axis=1)
+    print(sorted_data)
     formatted_data_train = GeneratedDataset(x_vals[int(len(x_vals)*.2):], y_vals[int(len(y_vals)*.2):])
     formatted_data_test = GeneratedDataset(x_vals[:int(len(x_vals)*.2)], y_vals[:int(len(y_vals)*.2)])
     data_loader_train = DataLoader(formatted_data_train)
@@ -253,5 +253,5 @@ if __name__ == "__main__":
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to('cpu')
     print(test(data_loader_test, temp_model, nn.MSELoss(), 'cpu'))
-    new_model = train_model_torch_boost(temp_model, dataset, model_string, 'cpu', 0.00004, 20)
+    new_model = train_model_torch_boost(temp_model, sorted_data, model_string, 'cpu', 0.00004, 20)
     print(test(data_loader_test, new_model, nn.MSELoss(), 'cpu'))
