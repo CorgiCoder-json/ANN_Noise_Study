@@ -8,7 +8,7 @@ import pandas as pd
 import os
 
 if __name__ == "__main__":
-    num_samples = 2000
+    num_samples = 17000
     num_features = 100
     num_inform = 10
     problem_x, problem_y = make_regression(num_samples, n_features=num_features, n_informative=num_inform)

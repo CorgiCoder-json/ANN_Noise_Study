@@ -119,6 +119,9 @@ if __name__ == "__main__":
         './generated_data_sets/small_5000_100_10_regression_generated.csv',
         './generated_data_sets/7000_100_10_regression_generated.csv',
         './generated_data_sets/10000_100_10_regression_generated.csv',
+        './generated_data_sets/12000_100_10_regression_generated.csv',
+        './generated_data_sets/15000_100_10_regression_generated.csv',
+        './generated_data_sets/17000_100_10_regression_generated.csv',
         './generated_data_sets/20000_100_10_regression_generated.csv'
     ]
     ramp_test = ramp_data_random_model(files)
