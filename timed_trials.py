@@ -46,11 +46,11 @@ def one_epoch_test_random_model(train_data, train_data_loader):
     model = NetworkSkeleton(create_layers(model_string, {'relu': nn.ReLU(), 'silu': nn.SiLU()}))
     model_copy = copy.deepcopy(model)
     start_time = time.time()
-    train_model_torch_thread(model, train_data, model_string, 'cpu', 0.00004, 100)
+    train_model_torch_thread(model, train_data, model_string, 'cpu', 0.00004, 20)
     end_time = time.time()
     my_method = end_time - start_time
     start_time = time.time()
-    train(train_data_loader, model_copy, nn.MSELoss(), torch.optim.SGD(model_copy.parameters(), lr=1e-5), 'cpu')
+    train(train_data_loader, model_copy, nn.MSELoss(), torch.optim.SGD(model_copy.parameters(), lr=1e-5, foreach=False, fused=False), 'cpu')
     end_time = time.time()
     gradient_method = end_time - start_time
     return my_method, gradient_method
@@ -87,8 +87,8 @@ def ramp_data_random_model(files):
         sorted_data = dataset.sort_values(by='z_answers', ascending=True).drop(["z_answers"], axis=1)
         formatted_data_train = GeneratedDataset(x_vals[int(len(x_vals)*.2):], y_vals[int(len(y_vals)*.2):])
         formatted_data_test = GeneratedDataset(x_vals[:int(len(x_vals)*.2)], y_vals[:int(len(y_vals)*.2)])
-        data_loader_train = DataLoader(formatted_data_train, batch_size=100)
-        data_loader_test = DataLoader(formatted_data_test, batch_size=100)
+        data_loader_train = DataLoader(formatted_data_train, batch_size=20)
+        data_loader_test = DataLoader(formatted_data_test, batch_size=20)
         results = one_epoch_test_random_model(sorted_data, data_loader_train)
         my_method.append(results[0])
         gradient_method.append(results[1])
@@ -112,8 +112,8 @@ if __name__ == "__main__":
     #     thread_boost, torch_boost = one_epoch_test_random_model_2(sorted_data)
     #     percent_boost = get_percent_imporvement(torch_boost, thread_boost)
     #     print(f"ROUND {i}:\n   THREAD + TORCH: {thread_boost}\n   TORCH: {torch_boost}\nROUND INCREASE PERCENT: {percent_boost}\n")
-    # # torch.set_num_threads(1)
-    # torch.backends.mkldnn.enabled = False
+    torch.set_num_threads(1)
+    torch.backends.mkldnn.enabled = False
     files = [
         './generated_data_sets/2000_100_10_regression_generated.csv',
         './generated_data_sets/small_5000_100_10_regression_generated.csv',

@@ -303,6 +303,67 @@ def train_model_torch_thread(model, dataset: pd.DataFrame, model_str, device, v,
         return_model.load_state_dict(model_copy.state_dict())
         return return_model
 
+def alternate_model_train_boosted(model, dataset, base_model_str, alt_model_str, device, v, batch_size):
+    total_iters = 0
+    model.eval()
+    with torch.no_grad():
+        num_rows = len(dataset)
+
+        #Extract the weights
+        temp_state = model.cpu().state_dict()
+        model_copy = NetworkSkeleton(create_layers(alt_model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
+        model_copy.load_state_dict(temp_state)
+        data_copy = copy.deepcopy(dataset)
+        x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
+        y_vals = data_copy.loc[:, data_copy.columns == 'y'].to_numpy()
+        result_sets = [zscore(x, axis=0)]
+        weights = []
+        model.to(device)
+
+        #TODO: Sort the data set by "outlierness" (sort by zscore of answer)
+        # data_copy = data_copy.sample(frac=1)
+        # x = data_copy.loc[:, data_copy.columns != 'y'].to_numpy()
+
+        #Step 1: move the data into the weight dimension
+        index = 1
+        temp_layers: nn.Sequential = model_copy.layers
+        end_flag = False
+        for layer in range(0,len(temp_layers),2):
+            new_data = result_sets[-1] if len(result_sets) > 0 else x
+            loader = DataLoader(GeneratedDataset(new_data, y_vals), batch_size=batch_size)
+            weights.append(temp_layers[layer].weight.numpy())
+            for X, y in loader:
+                try:
+                    result = temp_layers[layer+1](temp_layers[layer](X.type(torch.float))).numpy()
+                except Exception as e:
+                    end_flag = True
+                    break
+                try:
+                    result_sets[index] = np.append(result_sets[index], result, axis=0)
+                except Exception as e:
+                    result_sets.append(result)
+            if not end_flag:
+                result_sets[index] = zscore(result_sets[index])
+            index += 1               
+            
+        #Step 3: convert the zscores into delta weights
+        #Step 4: apply the delta weights to ALL neurons in the layer
+        with pooling.ThreadPoolExecutor() as pool:
+            future_objs = []
+            for i, item_set in enumerate(result_sets):
+                future_objs.append(pool.submit(add_weights, item_set, weights[i], v, num_rows))
+            for future in pooling.as_completed(future_objs):
+                future.result()
+
+        #Step 5: reapply the weights to a new model and return
+        index = 0
+        for item in model_copy.state_dict():
+            if item[-6:] == "weight":
+                model_copy.state_dict()[item] = weights[index]
+                index += 1
+        return_model = NetworkSkeleton(create_layers(base_model_str, {'relu': nn.ReLU(), 'silu': nn.SiLU()})).to(device)
+        return_model.load_state_dict(model_copy.state_dict())
+        return return_model
 if __name__ == "__main__":
     imp_dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
     x_vals = imp_dataset[imp_dataset.columns[imp_dataset.columns != 'y']].to_numpy()
@@ -316,9 +377,10 @@ if __name__ == "__main__":
     formatted_data_test = GeneratedDataset(x_vals[:int(len(x_vals)*.2)], y_vals[:int(len(y_vals)*.2)])
     data_loader_train = DataLoader(formatted_data_train)
     data_loader_test = DataLoader(formatted_data_test)
-    model_string = '100|200->silu->200|150->silu->150|1'
+    model_string = '100|200->relu->200|150->relu->150|1'
+    alt_string = '100|200->silu->200|150->silu->150|1'
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to('cpu')
     print(test(data_loader_test, temp_model, nn.MSELoss(), 'cpu'))
-    new_model = train_model_torch_thread(temp_model, sorted_data, model_string, 'cpu', 0.00004, 20)
+    new_model = alternate_model_train_boosted(temp_model, sorted_data, model_string, alt_string, 'cpu', 0.00004, 20)
     print(test(data_loader_test, new_model, nn.MSELoss(), 'cpu'))
