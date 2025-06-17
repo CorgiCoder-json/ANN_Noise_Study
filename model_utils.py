@@ -2,11 +2,13 @@ from pyexpat import model
 from matplotlib import figure
 import torch
 import torch.nn as nn
+from torch.utils.data import Dataset
 import copy
 import matplotlib.pyplot as plt
 import random
 import pandas as pd
 import os.path as path
+import numpy as np
 
 class NetworkSkeleton(nn.Module):
     def __init__(self, layers):
@@ -14,6 +16,15 @@ class NetworkSkeleton(nn.Module):
         self.layers = nn.Sequential(*layers)
     def forward(self, x):
         return self.layers.forward(x.type(torch.float))
+
+class GeneratedDataset(Dataset):
+    def __init__(self, x_data, y_data):
+        self.x = copy.deepcopy(x_data)
+        self.y = copy.deepcopy(y_data)
+    def __len__(self):
+        return len(self.x)
+    def __getitem__(self, index):
+        return self.x[index], np.float32(self.y[index])
 
 def save_network_heatmap(model: NetworkSkeleton, window_size: int, starting_weight: tuple[int, int], label: str, starting_device: str, figure_tracker: int, save_file: str):
     model_copy = copy.deepcopy(model.cpu())
