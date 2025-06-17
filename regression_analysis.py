@@ -30,28 +30,19 @@ if __name__ == "__main__":
     
     #Run the training loop
     for i in range(epochs):
-        train(data_loader_train, model, loss, optim, device)
-        print(f"Loss: {test(data_loader_train, model, loss, device)}")
-        
-    #Seperate the layers of the network and format a sample group
-    trained_layers = copy.deepcopy(model.cpu().layers)
-    model.to(device)
-    step_sample = dataset.sample(n=10)
-    samp_x_vals = step_sample[step_sample.columns[step_sample.columns != 'y']].to_numpy()
-    samp_y_vals =  step_sample[step_sample.columns[step_sample.columns == 'y']].to_numpy()
-    formatted_step_test = GeneratedDataset(samp_x_vals, samp_y_vals)
-    formatted_loader = DataLoader(formatted_step_test)
-    row_tracker = 1
-    for x, y in formatted_loader:
-        x_train = x.to('cpu').type(torch.float)
-        x_base = x.to('cpu').type(torch.float)
-        y = np.squeeze(y.to('cpu').type(torch.float).numpy())
+        trained_layers = copy.deepcopy(model.cpu().layers)
+        model.to(device)
+        samp_x, samp_y = next(iter(data_loader_test))
+        x_train = samp_x[0].to('cpu').type(torch.float)
+        x_base = samp_x[0].to('cpu').type(torch.float)
+        samp_y = np.squeeze(samp_y[0].to('cpu').type(torch.float).numpy())
+        row_tracker = 1
         for index in range(len(trained_layers)):
             print(type(trained_layers[index]))
             trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
-            trained_loss = (trained_pred - y) ** 2
-            base_loss = (base_pred - y) ** 2
+            trained_loss = (trained_pred - samp_y) ** 2
+            base_loss = (base_pred - samp_y) ** 2
             fig = plt.figure(0)
             plt.scatter(trained_loss, trained_pred, color='red', label='Trained Neurons')
             plt.scatter(base_loss, base_pred, color='blue', label='Base Neurons')
@@ -66,5 +57,43 @@ if __name__ == "__main__":
             x_train = torch.from_numpy(trained_pred).type(torch.float)
             x_base = torch.from_numpy(base_pred).type(torch.float)
         row_tracker += 1
+        train(data_loader_train, model, loss, optim, device)
+        print(f"Loss: {test(data_loader_test, model, loss, device)}")
+        
+        
+        
+    #Seperate the layers of the network and format a sample group
+    # trained_layers = copy.deepcopy(model.cpu().layers)
+    # model.to(device)
+    # step_sample = dataset.sample(n=10)
+    # samp_x_vals = step_sample[step_sample.columns[step_sample.columns != 'y']].to_numpy()
+    # samp_y_vals =  step_sample[step_sample.columns[step_sample.columns == 'y']].to_numpy()
+    # formatted_step_test = GeneratedDataset(samp_x_vals, samp_y_vals)
+    # formatted_loader = DataLoader(formatted_step_test)
+    # row_tracker = 1
+    # for x, y in formatted_loader:
+    #     x_train = x.to('cpu').type(torch.float)
+    #     x_base = x.to('cpu').type(torch.float)
+    #     y = np.squeeze(y.to('cpu').type(torch.float).numpy())
+    #     for index in range(len(trained_layers)):
+    #         print(type(trained_layers[index]))
+    #         trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
+    #         base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
+    #         trained_loss = (trained_pred - y) ** 2
+    #         base_loss = (base_pred - y) ** 2
+    #         fig = plt.figure(0)
+    #         plt.scatter(trained_loss, trained_pred, color='red', label='Trained Neurons')
+    #         plt.scatter(base_loss, base_pred, color='blue', label='Base Neurons')
+    #         plt.title(f"Neuron Loss for Row {row_tracker}")
+    #         plt.xlabel('Loss (MSE)')
+    #         plt.ylabel('Guessed Value (#)')
+    #         plt.legend()
+    #         plt.show()
+    #         if isinstance(trained_loss, np.float32):
+    #             print(f"Final Trained Loss: {trained_loss}")
+    #             print(f"Final Base Loss: {base_loss}")
+    #         x_train = torch.from_numpy(trained_pred).type(torch.float)
+    #         x_base = torch.from_numpy(base_pred).type(torch.float)
+    #     row_tracker += 1
     
     print("Hello World!")
