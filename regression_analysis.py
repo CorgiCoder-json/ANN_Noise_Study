@@ -3,14 +3,15 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import pandas as pd
 from model_utils import NetworkSkeleton, create_layers, GeneratedDataset, train, test
+from dropout_pass_update import train_model_torch_boost
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
 
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->hlrelu->150|120->silu->120|200->llrelu->200|1'
-    string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1)}
+    net_string = '100|150->relu->150|120->relu->120|200->relu->200|1'
+    string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
     loss = nn.MSELoss()
