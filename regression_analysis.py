@@ -1,6 +1,7 @@
 """
 pytorch docs were used to find the loss functions for numpy calculation
 BCE: https://docs.pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#bceloss
+MAE (L1Loss): https://docs.pytorch.org/docs/stable/generated/torch.nn.L1Loss.html
 MSE: https://docs.pytorch.org/docs/stable/generated/torch.nn.MSELoss.html#torch.nn.MSELoss
 """
 
@@ -26,12 +27,12 @@ def numpy_bce(pred, true):
 
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->tanh->150|120->sig->120|200->tanh->200|1'
+    net_string = '100|150->sig->150|120->sig->120|200->sig->200|1'
     string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
     loss = nn.BCEWithLogitsLoss()
-    optim = torch.optim.SGD(model.parameters(), 1e-2)
+    optim = torch.optim.SGD(model.parameters(), 5e-2)
     epochs = 8
     
     #Load and format the data into test and training sets
@@ -61,17 +62,19 @@ if __name__ == "__main__":
         samp_y = np.squeeze(samp_y[0].to('cpu').type(torch.float).numpy())
         row_tracker = 1
         for index in range(len(trained_layers)):
-            print(type(trained_layers[index]))
             trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
             trained_loss = numpy_bce(trained_pred, samp_y)
             base_loss = numpy_bce(base_pred, samp_y)
+            print(type(trained_layers[index]))
+            print(f"Trained Model Losses: {trained_loss}")
+            print(f"Original Model Loss: {base_loss}")
             fig = plt.figure(0)
-            plt.scatter(trained_loss, trained_pred, color='red', label='Trained Neurons')
-            plt.scatter(base_loss, base_pred, color='blue', label='Base Neurons')
+            plt.scatter(trained_pred, trained_loss, color='red', label='Trained Neurons')
+            plt.scatter(base_pred, base_loss, color='blue', label='Base Neurons')
             plt.title(f"Neuron Loss for Row {row_tracker}")
-            plt.xlabel('Loss (MSE)')
-            plt.ylabel('Guessed Value (#)')
+            plt.xlabel('Guessed Value (#)')
+            plt.ylabel('Loss (BCE)')
             plt.legend()
             plt.show()
             if isinstance(trained_loss, np.float32):
