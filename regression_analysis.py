@@ -67,21 +67,21 @@ if __name__ == "__main__":
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
             trained_loss = numpy_mse(trained_pred, samp_y)
             base_loss = numpy_mse(base_pred, samp_y)
+            fig = plt.figure(0)
             try:
                 reg_fit_trained = np.polyfit(trained_pred, trained_loss, 1)
                 reg_fit_base = np.polyfit(base_pred, base_loss, 1)
                 trained_line = reg_fit_trained[0] * trained_pred + reg_fit_trained[1]
-                base_line = reg_fit_base[0] * trained_pred + reg_fit_base[1]
-                print(r2_score(trained_loss, trained_line))
-                print(r2_score(base_loss, base_line))
+                base_line = reg_fit_base[0] * base_pred + reg_fit_base[1]
+                print(f"Trained R^2 score: {r2_score(trained_loss, trained_line)}")
+                print(f"Base R^2 score: {r2_score(base_loss, base_line)}")
+                plt.plot(trained_pred, trained_line, color='red', label='Trained Line')
+                plt.plot(base_pred, base_line, color='blue', label='Base line')
             except:
                 pass
             print(reg_fit_trained)
             print(reg_fit_base)
             print(type(trained_layers[index]))
-            fig = plt.figure(0)
-            plt.plot(trained_pred, trained_line, color='red', label='Trained Line')
-            plt.plot(trained_pred, base_line, color='blue', label='Base line')
             plt.scatter(trained_pred, trained_loss, color='red', label='Trained Neurons')
             plt.scatter(base_pred, base_loss, color='blue', label='Base Neurons')
             plt.title(f"Neuron Loss for Row {row_tracker}")
