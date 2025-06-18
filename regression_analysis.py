@@ -27,17 +27,17 @@ def numpy_bce(pred, true):
 
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->sig->150|120->sig->120|200->sig->200|1'
+    net_string = '100|150->llrelu->150|120->relu->120|200->hlrelu->200|1'
     string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
-    loss = nn.BCEWithLogitsLoss()
-    optim = torch.optim.SGD(model.parameters(), 5e-2)
+    loss = nn.MSELoss()
+    optim = torch.optim.SGD(model.parameters(), 1e-4)
     epochs = 8
     
     #Load and format the data into test and training sets
-    dataset = pd.read_csv("generated_data_sets/5000_100_10_classification_generated.csv")
-    dataset.drop(dataset.columns[0], axis=1, inplace=True)
+    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
+    # dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
     y_vals =  dataset[dataset.columns[dataset.columns == 'y']].to_numpy()
     dataset = pd.DataFrame(x_vals[int(len(x_vals)*.2):])
@@ -64,12 +64,21 @@ if __name__ == "__main__":
         for index in range(len(trained_layers)):
             trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
-            trained_loss = numpy_bce(trained_pred, samp_y)
-            base_loss = numpy_bce(base_pred, samp_y)
+            trained_loss = numpy_mse(trained_pred, samp_y)
+            base_loss = numpy_mse(base_pred, samp_y)
+            try:
+                reg_fit_trained = np.polyfit(trained_pred, trained_loss, 1)
+                reg_fit_base = np.polyfit(base_pred, base_loss, 1)
+                trained_line = reg_fit_trained[0] * np.linspace(np.min(trained_pred), np.max(trained_pred), 100) + reg_fit_trained[1]
+                base_line = reg_fit_base[0] * np.linspace(np.min(base_pred), np.max(base_pred), 100) + reg_fit_base[1]
+            except:
+                pass
+            print(reg_fit_trained)
+            print(reg_fit_base)
             print(type(trained_layers[index]))
-            print(f"Trained Model Losses: {trained_loss}")
-            print(f"Original Model Loss: {base_loss}")
             fig = plt.figure(0)
+            plt.plot(np.linspace(np.min(trained_pred), np.max(trained_pred), 100), trained_line, color='red', label='Trained Line')
+            plt.plot(np.linspace(np.min(base_pred), np.max(base_pred), 100), base_line, color='blue', label='Base line')
             plt.scatter(trained_pred, trained_loss, color='red', label='Trained Neurons')
             plt.scatter(base_pred, base_loss, color='blue', label='Base Neurons')
             plt.title(f"Neuron Loss for Row {row_tracker}")
