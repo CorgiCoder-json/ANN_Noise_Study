@@ -18,17 +18,20 @@ from scipy.stats import zscore
 def numpy_mse(pred, true):
     return (pred - true) ** 2
 
+def numpy_mae(pred, true):
+    return np.abs(pred - true)
+
 def numpy_bce(pred, true):
     return true*(np.log(pred)) + (1-true)*np.log(1-pred)
 
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->sig->150|120->sig->120|200->sig->200|1'
-    string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid()}
+    net_string = '100|150->tanh->150|120->sig->120|200->tanh->200|1'
+    string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
     loss = nn.BCEWithLogitsLoss()
-    optim = torch.optim.Adam(model.parameters(), 5e-3)
+    optim = torch.optim.SGD(model.parameters(), 1e-2)
     epochs = 8
     
     #Load and format the data into test and training sets
