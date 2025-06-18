@@ -7,10 +7,11 @@ from dropout_pass_update import train_model_torch_boost
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
+from scipy.stats import zscore
 
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->relu->150|120->relu->120|200->relu->200|1'
+    net_string = '100|150->silu->150|120->silu->120|200->silu->200|1'
     string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
@@ -22,6 +23,11 @@ if __name__ == "__main__":
     dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
     y_vals =  dataset[dataset.columns[dataset.columns == 'y']].to_numpy()
+    dataset = pd.DataFrame(x_vals[int(len(x_vals)*.2):])
+    dataset["y"] = y_vals[int(len(y_vals)*.2):]
+    dataset["z_answers"] = zscore(dataset['y'])
+    dataset["z_answers"] = dataset['z_answers'].abs()
+    sorted_data = dataset.sort_values(by='z_answers', ascending=True).drop(["z_answers"], axis=1)
     formatted_data_train = GeneratedDataset(x_vals[int(len(x_vals)*.2):], y_vals[int(len(y_vals)*.2):])
     formatted_data_test = GeneratedDataset(x_vals[:int(len(x_vals)*.2)], y_vals[:int(len(y_vals)*.2)])
     data_loader_train = DataLoader(formatted_data_train, 50)
@@ -58,8 +64,9 @@ if __name__ == "__main__":
             x_train = torch.from_numpy(trained_pred).type(torch.float)
             x_base = torch.from_numpy(base_pred).type(torch.float)
         row_tracker += 1
-        train(data_loader_train, model, loss, optim, device)
+        model = train_model_torch_boost(model, sorted_data, net_string, device, 0.00004, 50)
         print(f"Loss: {test(data_loader_test, model, loss, device)}")
+
         
         
         
