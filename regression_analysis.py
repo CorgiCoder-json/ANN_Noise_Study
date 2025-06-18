@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import copy
 from scipy.stats import zscore
+from sklearn.metrics import r2_score
 
 def numpy_mse(pred, true):
     return (pred - true) ** 2
@@ -69,16 +70,18 @@ if __name__ == "__main__":
             try:
                 reg_fit_trained = np.polyfit(trained_pred, trained_loss, 1)
                 reg_fit_base = np.polyfit(base_pred, base_loss, 1)
-                trained_line = reg_fit_trained[0] * np.linspace(np.min(trained_pred), np.max(trained_pred), 100) + reg_fit_trained[1]
-                base_line = reg_fit_base[0] * np.linspace(np.min(base_pred), np.max(base_pred), 100) + reg_fit_base[1]
+                trained_line = reg_fit_trained[0] * trained_pred + reg_fit_trained[1]
+                base_line = reg_fit_base[0] * trained_pred + reg_fit_base[1]
+                print(r2_score(trained_loss, trained_line))
+                print(r2_score(base_loss, base_line))
             except:
                 pass
             print(reg_fit_trained)
             print(reg_fit_base)
             print(type(trained_layers[index]))
             fig = plt.figure(0)
-            plt.plot(np.linspace(np.min(trained_pred), np.max(trained_pred), 100), trained_line, color='red', label='Trained Line')
-            plt.plot(np.linspace(np.min(base_pred), np.max(base_pred), 100), base_line, color='blue', label='Base line')
+            plt.plot(trained_pred, trained_line, color='red', label='Trained Line')
+            plt.plot(trained_pred, base_line, color='blue', label='Base line')
             plt.scatter(trained_pred, trained_loss, color='red', label='Trained Neurons')
             plt.scatter(base_pred, base_loss, color='blue', label='Base Neurons')
             plt.title(f"Neuron Loss for Row {row_tracker}")
