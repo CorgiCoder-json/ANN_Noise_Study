@@ -1,3 +1,9 @@
+"""
+pytorch docs were used to find the loss functions for numpy calculation
+BCE: https://docs.pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#bceloss
+MSE: https://docs.pytorch.org/docs/stable/generated/torch.nn.MSELoss.html#torch.nn.MSELoss
+"""
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -9,18 +15,25 @@ import numpy as np
 import copy
 from scipy.stats import zscore
 
+def numpy_mse(pred, true):
+    return (pred - true) ** 2
+
+def numpy_bce(pred, true):
+    return true*(np.log(pred)) + (1-true)*np.log(1-pred)
+
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->silu->150|120->silu->120|200->silu->200|1'
+    net_string = '100|150->sig->150|120->sig->120|200->sig->200|1'
     string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
-    loss = nn.MSELoss()
-    optim = torch.optim.Adam(model.parameters(), 1e-3)
+    loss = nn.BCEWithLogitsLoss()
+    optim = torch.optim.Adam(model.parameters(), 5e-3)
     epochs = 8
     
     #Load and format the data into test and training sets
-    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
+    dataset = pd.read_csv("generated_data_sets/5000_100_10_classification_generated.csv")
+    dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
     y_vals =  dataset[dataset.columns[dataset.columns == 'y']].to_numpy()
     dataset = pd.DataFrame(x_vals[int(len(x_vals)*.2):])
@@ -48,8 +61,8 @@ if __name__ == "__main__":
             print(type(trained_layers[index]))
             trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
-            trained_loss = (trained_pred - samp_y) ** 2
-            base_loss = (base_pred - samp_y) ** 2
+            trained_loss = numpy_bce(trained_pred, samp_y)
+            base_loss = numpy_bce(base_pred, samp_y)
             fig = plt.figure(0)
             plt.scatter(trained_loss, trained_pred, color='red', label='Trained Neurons')
             plt.scatter(base_loss, base_pred, color='blue', label='Base Neurons')
@@ -64,7 +77,7 @@ if __name__ == "__main__":
             x_train = torch.from_numpy(trained_pred).type(torch.float)
             x_base = torch.from_numpy(base_pred).type(torch.float)
         row_tracker += 1
-        model = train_model_torch_boost(model, sorted_data, net_string, device, 0.00004, 50)
+        train(data_loader_train, model, loss, optim, device)
         print(f"Loss: {test(data_loader_test, model, loss, device)}")
 
         
