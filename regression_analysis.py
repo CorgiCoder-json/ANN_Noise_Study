@@ -28,12 +28,12 @@ def numpy_bce(pred, true):
 
 if __name__ == "__main__":
     # Define the Network Variables
-    net_string = '100|150->llrelu->150|120->relu->120|200->hlrelu->200|1'
+    net_string = '100|150->silu->150|120->relu->120|200->relu->200|1'
     string_to_activations = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.1), 'hlrelu': nn.LeakyReLU(1.1), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh()}
     device = 'cuda'
     model = NetworkSkeleton(create_layers(net_string, string_to_activations)).to(device)
-    loss = nn.MSELoss()
-    optim = torch.optim.SGD(model.parameters(), 1e-4)
+    loss = nn.L1Loss()
+    optim = torch.optim.RMSprop(model.parameters(), 1e-3)
     epochs = 8
     
     #Load and format the data into test and training sets
@@ -65,8 +65,8 @@ if __name__ == "__main__":
         for index in range(len(trained_layers)):
             trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
-            trained_loss = numpy_mse(trained_pred, samp_y)
-            base_loss = numpy_mse(base_pred, samp_y)
+            trained_loss = numpy_mae(trained_pred, samp_y)
+            base_loss = numpy_mae(base_pred, samp_y)
             fig = plt.figure(0)
             try:
                 reg_fit_trained = np.polyfit(trained_pred, trained_loss, 1)
