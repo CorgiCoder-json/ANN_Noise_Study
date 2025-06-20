@@ -164,7 +164,7 @@ def get_percent_imporvement(start_loss, min_loss):
     return (math.fabs(start_loss - min_loss) / start_loss) * 100.0
 
 if __name__ == "__main__":
-    imp_dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
+    imp_dataset = pd.read_csv("generated_data_sets/5000_100_10_regression_generated.csv")
     x_vals = imp_dataset[imp_dataset.columns[imp_dataset.columns != 'y']].to_numpy()
     y_vals = imp_dataset[imp_dataset.columns[imp_dataset.columns == 'y']].to_numpy()
     min_ratio = 0.2
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     percent_improvements = []
     trained_min_loss = []
     losses = []
-    model_string = '100|200->relu->200|150->relu->150|1'
+    model_string = '100|200->relu->200|150->relu->150|100->relu->100|1'
     string_to_activation = {'relu': nn.ReLU(), 'silu': nn.SiLU()}
     for j in range(1):
         temp_model = NetworkSkeleton(create_layers(model_string, string_to_activation)).to(global_device)
@@ -187,7 +187,7 @@ if __name__ == "__main__":
         steps = 8
         for i in range(steps):
             #volitility = math.exp(-1.0*(i+1.0)/6.0)*0.00004
-            volitility = 0.00006
+            volitility = 0.0006
             print(f"MSE OF THE TRAINED MODEL AFTER TRAINING ROUND {i}: ")
             acc = test(data_loader, trained_model, nn.MSELoss(), device=global_device)
             print(f"Loss: {acc}")
