@@ -3,12 +3,15 @@ Created: 6/19/2025
 
 purpose: Generate many models and collect key data on it 
 """
+import concurrent.futures
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import model_utils as util
 import pandas as pd
 import random
+import concurrent
+import copy
 
 def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> dict[int, tuple[DataLoader, DataLoader]]:
     preped_data = {}
@@ -25,6 +28,17 @@ def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> di
         test_loader = DataLoader(test_dataset, batch_size, shuffle=True)
         preped_data.update({int(row_amount): (train_loader, test_loader)})
     return preped_data
+
+def custom_train(model: util.NetworkSkeleton, prep_data: tuple[DataLoader, DataLoader], row_count: int, optim, err, problem: str, epochs: int):
+    for epoch in range(epochs):
+        util.train(prep_data[0], model, err, optim, 'cpu')
+        # save_model parameters
+        util.test(prep_data[1], model, err, 'cpu')
+    #open matadata file in write:
+        # record final accuarcy
+        # record optimizer
+        # record loss function
+    # DONT SAVE NEURON AS REGRESSION DATA; can be done post model training. Make a seperate saving folder
         
 
 if __name__ == "__main__":
@@ -59,4 +73,6 @@ if __name__ == "__main__":
     for i in range(100):
         base_model_class = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), classification_dict))
         base_model_regress = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), regression_dict))
-        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(regress_files) + len(class_files)) as worker_pool:
+            for index, item in enumerate(regress_files):
+                worker_pool.submit(custom_train, copy.deepcopy())
