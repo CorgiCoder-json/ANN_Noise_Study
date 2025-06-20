@@ -8,7 +8,7 @@ import pandas as pd
 import os
 
 if __name__ == "__main__":
-    num_samples = 5000
+    num_samples = 20000
     num_features = 100
     num_inform = 10
     problem_x, problem_y = make_classification(num_samples, n_features=num_features, n_informative=num_inform)
