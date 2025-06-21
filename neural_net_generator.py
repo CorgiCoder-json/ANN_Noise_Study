@@ -45,7 +45,7 @@ if __name__ == "__main__":
     classification_dict = {'relu': nn.ReLU(), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh(), 'silu': nn.SiLU()}
     regression_dict = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
     in_dim = 100
-    num_hidden = [2, 3, 4]
+    num_hidden = [0, 1, 2]
     num_out = 1
     size_range = (100, 300)
     regress_files = [
@@ -70,9 +70,11 @@ if __name__ == "__main__":
     ]
     regress_data = prep(regress_files, 0.2)
     class_data = prep(class_files, 0.2)
-    for i in range(100):
-        base_model_class = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), classification_dict))
+    for i in range(1):
+        base_model_class = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range), classification_dict))
         base_model_regress = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), regression_dict))
-        with concurrent.futures.ThreadPoolExecutor(max_workers=len(regress_files) + len(class_files)) as worker_pool:
-            for index, item in enumerate(regress_files):
-                worker_pool.submit(custom_train, copy.deepcopy())
+        loss = nn.MSELoss()
+        opt = torch.optim.SGD(base_model_regress.parameters(), lr=1e-4)
+        for j in range(8):
+            util.train(regress_data[2000][0], base_model_regress, loss, opt, 'cpu')
+            print(util.test(regress_data[2000][1], base_model_regress, loss, 'cpu'))
