@@ -26,6 +26,11 @@ def numpy_mae(pred, true):
 def numpy_bce(pred, true):
     return true*(np.log(pred)) + (1-true)*np.log(1-pred)
 
+def display_loss_pred_graph(trained_predictions, base_redictions, true_values):
+    for index in range(len(trained_predictions)):
+        pass
+    
+
 if __name__ == "__main__":
     # Define the Network Variables
     net_string = '100|150->silu->150|120->relu->120|200->relu->200|1'
@@ -37,7 +42,7 @@ if __name__ == "__main__":
     epochs = 8
     
     #Load and format the data into test and training sets
-    dataset = pd.read_csv("generated_data_sets/small_5000_100_10_regression_generated.csv")
+    dataset = pd.read_csv("generated_data_sets/5000_100_10_regression_generated.csv")
     # dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
     y_vals =  dataset[dataset.columns[dataset.columns == 'y']].to_numpy()
@@ -59,41 +64,59 @@ if __name__ == "__main__":
         model.to(device)
         samp_x, samp_y = next(iter(data_loader_test))
         x_train = samp_x[0].to('cpu').type(torch.float)
+        x_train_2 = samp_x[1].to('cpu').type(torch.float)
         x_base = samp_x[0].to('cpu').type(torch.float)
+        x_base_2 = samp_x[1].to('cpu').type(torch.float)
+        samp_y_2 = np.squeeze(samp_y[1].to('cpu').type(torch.float).numpy())
         samp_y = np.squeeze(samp_y[0].to('cpu').type(torch.float).numpy())
         row_tracker = 1
         for index in range(len(trained_layers)):
             trained_pred = np.squeeze(trained_layers[index].forward(x_train).detach().numpy())
+            trained_pred_2 = np.squeeze(trained_layers[index].forward(x_train_2).detach().numpy())
             base_pred = np.squeeze(base_layers[index].forward(x_base).detach().numpy())
+            base_pred_2 = np.squeeze(base_layers[index].forward(x_base_2).detach().numpy())
             trained_loss = numpy_mae(trained_pred, samp_y)
+            trained_loss_2 = numpy_mae(trained_pred_2, samp_y_2)
             base_loss = numpy_mae(base_pred, samp_y)
+            base_loss_2 = numpy_mae(base_pred_2, samp_y_2)
             fig = plt.figure(0)
             try:
                 reg_fit_trained = np.polyfit(trained_pred, trained_loss, 1)
+                reg_fit_trained_2 = np.polyfit(trained_pred_2, trained_loss_2, 1)
                 reg_fit_base = np.polyfit(base_pred, base_loss, 1)
+                reg_fit_base_2 = np.polyfit(base_pred_2, base_loss_2, 1)
                 trained_line = reg_fit_trained[0] * trained_pred + reg_fit_trained[1]
+                trained_line_2 = reg_fit_trained_2[0] * trained_pred_2 + reg_fit_trained_2[1]
                 base_line = reg_fit_base[0] * base_pred + reg_fit_base[1]
-                print(f"Trained R^2 score: {r2_score(trained_loss, trained_line)}")
-                print(f"Base R^2 score: {r2_score(base_loss, base_line)}")
+                base_line_2 = reg_fit_base_2[0] * base_pred_2 + reg_fit_base_2[1]
+                print(f"Trained 1 R^2 score: {r2_score(trained_loss, trained_line)}")
+                print(f"Base 1 R^2 score: {r2_score(base_loss, base_line)}")
+                print(f"Trained 2 R^2 score: {r2_score(trained_loss_2, trained_line_2)}")
+                print(f"Base 2 R^2 score: {r2_score(base_loss_2, base_line_2)}")
                 plt.plot(trained_pred, trained_line, color='red', label='Trained Line')
+                plt.plot(trained_pred_2, trained_line_2, color='orange', label='Trained Line 2')
                 plt.plot(base_pred, base_line, color='blue', label='Base line')
+                plt.plot(base_pred_2, base_line_2, color='cyan', label='Base Line 2')
             except:
                 pass
             print(reg_fit_trained)
+            print(reg_fit_trained_2)
             print(reg_fit_base)
+            print(reg_fit_base_2)
             print(type(trained_layers[index]))
             plt.scatter(trained_pred, trained_loss, color='red', label='Trained Neurons')
+            plt.scatter(trained_pred_2, trained_loss_2, color='orange', label='Trained Neurons 2')
             plt.scatter(base_pred, base_loss, color='blue', label='Base Neurons')
-            plt.title(f"Neuron Loss for Row {row_tracker}")
+            plt.scatter(base_pred_2, base_loss_2, color='cyan', label='Base Neurons 2')
+            plt.title(f"Layer Guessed Values v. Loss")
             plt.xlabel('Guessed Value (#)')
             plt.ylabel('Loss (BCE)')
             plt.legend()
             plt.show()
-            if isinstance(trained_loss, np.float32):
-                print(f"Final Trained Loss: {trained_loss}")
-                print(f"Final Base Loss: {base_loss}")
             x_train = torch.from_numpy(trained_pred).type(torch.float)
+            x_train_2 = torch.from_numpy(trained_pred_2).type(torch.float)
             x_base = torch.from_numpy(base_pred).type(torch.float)
+            x_base_2 = torch.from_numpy(base_pred_2).type(torch.float)
         row_tracker += 1
         train(data_loader_train, model, loss, optim, device)
         print(f"Loss: {test(data_loader_test, model, loss, device)}")
