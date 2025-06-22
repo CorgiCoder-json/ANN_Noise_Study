@@ -74,7 +74,8 @@ if __name__ == "__main__":
         base_model_class = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range), classification_dict))
         base_model_regress = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), regression_dict))
         loss = nn.MSELoss()
-        opt = torch.optim.SGD(base_model_regress.parameters(), lr=1e-4)
+        opt = torch.optim.RMSprop(base_model_regress.parameters(), lr=1e-3)
         for j in range(8):
             util.train(regress_data[2000][0], base_model_regress, loss, opt, 'cpu')
             print(util.test(regress_data[2000][1], base_model_regress, loss, 'cpu'))
+        print(base_model_regress)
