@@ -110,7 +110,7 @@ def model_str_file_name(model_str):
     file_path = model_str.replace('->', '_').replace('|', '-')
     return file_path 
 
-def save_model_parameters(model, model_str, pre_or_post, problem_type, device):
+def save_model_parameters(model, model_str, begin_path, pre_or_post, device):
     ID = 1
     model_copy = copy.deepcopy(model.cpu())
     params = model_copy.state_dict()
@@ -118,10 +118,10 @@ def save_model_parameters(model, model_str, pre_or_post, problem_type, device):
     for item in params:
         if item[-6:] == "weight":
             table = pd.DataFrame(params[item])
-            table.to_csv(path.join(f"{problem_type}", "weights", f"{model_str_file_name(model_str)}_{pre_or_post}_layer_{layer}.csv"),index=False)
+            table.to_csv(path.join(begin_path, f"{model_str_file_name(model_str)}_{pre_or_post}_layer_{layer}.csv"),index=False)
         else:
             series = pd.Series(params[item])
-            series.to_csv(path.join(f"{problem_type}", "biases", f"{model_str_file_name(model_str)}_{pre_or_post}_layer_{layer}.csv"),index=False)
+            series.to_csv(path.join(begin_path, f"{model_str_file_name(model_str)}_{pre_or_post}_layer_{layer}.csv"),index=False)
             layer += 1
         ID += 1
     model.to(device)       

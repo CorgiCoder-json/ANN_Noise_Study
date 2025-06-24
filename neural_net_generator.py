@@ -12,6 +12,7 @@ import pandas as pd
 import random
 import concurrent
 import copy
+from AI_weight_generation import run_tests
 
 def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> dict[int, tuple[DataLoader, DataLoader]]:
     preped_data = {}
@@ -48,6 +49,12 @@ if __name__ == "__main__":
     num_hidden = [0, 1, 2]
     num_out = 1
     size_range = (100, 300)
+    optimizer_list = [
+        torch.optim.SGD,
+        torch.optim.Adam,
+        torch.optim.RMSprop,
+        torch.optim.Rprop
+    ]
     regress_files = [
         "./generated_data_sets/2000_100_10_regression_generated.csv",
         "./generated_data_sets/5000_100_10_regression_generated.csv",
