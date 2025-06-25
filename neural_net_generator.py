@@ -85,8 +85,11 @@ if __name__ == "__main__":
     all_files.extend(class_files)
     model_id = 0
     for i in range(1):
-        base_model_class = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range), classification_dict))
-        base_model_regress = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), regression_dict))
+        print(f"Entering Testing loop for try {i}")
+        class_str = util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range)
+        regress_str = util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range)
+        base_model_class = util.NetworkSkeleton(util.create_layers(class_str, classification_dict))
+        base_model_regress = util.NetworkSkeleton(util.create_layers(regress_str, regression_dict))
         regress_loss = nn.MSELoss()
         class_loss = nn.BCEWithLogitsLoss()
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(all_files)) as execut:
@@ -97,8 +100,10 @@ if __name__ == "__main__":
                     os.mkdir(main_path_classification + f"\\{label}_rows\\model_{model_id}")
                 except FileExistsError:
                     print("Error has occured! directory overwrite happened, should not be the case")
-                futures.append(execut.submit(run_tests, regress_data[label], 'cpu', 1, 30, 16, regress_loss, random.choice(optimizer_list), regression_dict, main_path_regression + f"\\{label}_rows\\model_{model_id}",copy.deepcopy(base_model_regress)))
-                futures.append(execut.submit(run_tests, class_data[label], 'cpu', 1, 30, 0.2, class_loss, random.choice(optimizer_list), classification_dict, main_path_classification + f"\\{label}_rows\\model_{model_id}",copy.deepcopy(base_model_class)))
-            for future in futures:
+                futures.append(execut.submit(run_tests, regress_data[label], 'cpu', 1, 30, 16, regress_loss, random.choice(optimizer_list), regression_dict, main_path_regression + f"\\{label}_rows\\model_{model_id}",copy.deepcopy(base_model_regress), regress_str))
+                futures.append(execut.submit(run_tests, class_data[label], 'cpu', 1, 30, 0.2, class_loss, random.choice(optimizer_list), classification_dict, main_path_classification + f"\\{label}_rows\\model_{model_id}",copy.deepcopy(base_model_class), class_str))
+            for future in concurrent.futures.as_completed(futures):
+                print("Gathering all the data...")
                 future.result()
         model_id += 1
+    print("Exited! check the results to ensure correct output")

@@ -35,7 +35,7 @@ class GeneratedDataset(Dataset):
     def __getitem__(self, index):
         return self.x[index], np.float32(self.y[index])
 
-def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, activation_pool, insert_path, base_model = None):
+def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, activation_pool, insert_path, base_model = None, model_str = None):
     data_load_train, data_load_test = None, None
     if isinstance(data, np.ndarray):    
         data_set_train = GeneratedDataset(data[0][int(len(data[0])*.2):], data[1][int(len(data[1])*.2):])
@@ -46,6 +46,7 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
         data_load_train = data[0]
         data_load_test = data[1]
     lr = 1e-4
+    model = base_model
     for i in range(num_test):
         if base_model == None:
             model_str = model_string_generator(100, random.choice([0,1,2]), 1, list(activation_pool.keys()), (40, 450))
