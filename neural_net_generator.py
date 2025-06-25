@@ -12,6 +12,7 @@ import pandas as pd
 import random
 import concurrent
 import copy
+import os
 from AI_weight_generation import run_tests
 
 def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> dict[int, tuple[DataLoader, DataLoader]]:
@@ -47,13 +48,16 @@ if __name__ == "__main__":
     regression_dict = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
     in_dim = 100
     num_hidden = [0, 1, 2]
+    labels = [2000, 5000, 7000, 10000, 12000, 15000, 17000, 20000]
     num_out = 1
     size_range = (100, 300)
+    main_path_regression = "D:\\model_dataset\\regression"
+    main_path_classification = "D:\\model_dataset\\classification"
     optimizer_list = [
         torch.optim.SGD,
         torch.optim.Adam,
         torch.optim.RMSprop,
-        torch.optim.Rprop
+        torch.optim.ASGD
     ]
     regress_files = [
         "./generated_data_sets/2000_100_10_regression_generated.csv",
@@ -77,9 +81,24 @@ if __name__ == "__main__":
     ]
     regress_data = prep(regress_files, 0.2)
     class_data = prep(class_files, 0.2)
+    all_files = copy.deepcopy(regress_files)
+    all_files.extend(class_files)
+    model_id = 0
     for i in range(1):
         base_model_class = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range), classification_dict))
         base_model_regress = util.NetworkSkeleton(util.create_layers(util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range), regression_dict))
-        loss = nn.MSELoss()
-        opt = torch.optim.RMSprop(base_model_regress.parameters(), lr=1e-3)
-        run_tests()
+        regress_loss = nn.MSELoss()
+        class_loss = nn.BCEWithLogitsLoss()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(all_files)) as execut:
+            futures = []
+            for label in labels:
+                try:
+                    os.mkdir(main_path_regression + f"\\{label}_rows\\model_{model_id}")
+                    os.mkdir(main_path_classification + f"\\{label}_rows\\model_{model_id}")
+                except FileExistsError:
+                    print("Error has occured! directory overwrite happened, should not be the case")
+                futures.append(execut.submit(run_tests, regress_data[label], 'cpu', 1, 30, 16, regress_loss, random.choice(optimizer_list), regression_dict, main_path_regression + f"\\{label}_rows\\model_{model_id}",copy.deepcopy(base_model_regress)))
+                futures.append(execut.submit(run_tests, class_data[label], 'cpu', 1, 30, 0.2, class_loss, random.choice(optimizer_list), classification_dict, main_path_classification + f"\\{label}_rows\\model_{model_id}",copy.deepcopy(base_model_class)))
+            for future in futures:
+                future.result()
+        model_id += 1

@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import copy
 import os.path as path
+import os
 import random
 
 activation_pool = {'relu': nn.ReLU(), 
@@ -52,9 +53,11 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
         save_model_parameters(model, model_str, insert_path, 'pre', device)
         j = 0
         acc = min_error + 1
+        os.mkdir(insert_path + f"\\training")
         while j < epochs and min_error < acc:
             train(data_load_train, model, error_func, optimize(model.parameters(), lr=lr),device)
             acc = test(data_load_test, model, error_func, device)
+            save_model_parameters(model, model_str, insert_path + f"\\training", f'epoch_{j}', device)
             j += 1
         save_model_parameters(model, model_str, insert_path, 'post', device)
         with open(path.join(insert_path, model_str_file_name(model_str) + "_report.txt"), 'wt') as file:
