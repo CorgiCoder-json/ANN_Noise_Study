@@ -1,4 +1,4 @@
-from sklearn.datasets import make_regression
+from sklearn.datasets import make_classification, make_regression
 import torch.optim.sgd
 import torch.optim.sgd
 from model_utils import save_model_parameters, save_network_heatmap, create_layers, model_string_generator, train, test, model_str_file_name, NetworkSkeleton
@@ -10,6 +10,7 @@ import copy
 import os.path as path
 import os
 import random
+import pandas as pd
 
 activation_pool = {'relu': nn.ReLU(), 
                    'sig': nn.Sigmoid(), 
@@ -40,8 +41,8 @@ class GeneratedDataset(Dataset):
 def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, activation_pool, insert_path, base_model = None, model_str = None):
     data_load_train, data_load_test = None, None
     if isinstance(data, np.ndarray):    
-        data_set_train = GeneratedDataset(data[0][int(len(data[0])*.2):], data[1][int(len(data[1])*.2):])
-        data_set_test = GeneratedDataset(data[0][:int(len(data[0])*.2)], data[1][:int(len(data[1])*.2)])
+        data_set_train = GeneratedDataset(data[int(len(data[0])*.2):], data[int(len(data[1])*.2):])
+        data_set_test = GeneratedDataset(data[:int(len(data[0])*.2)], data[:int(len(data[1])*.2)])
         data_load_train = DataLoader(data_set_train, batch_size=50, shuffle=True)
         data_load_test = DataLoader(data_set_test, batch_size=50, shuffle=True)
     if isinstance(data, tuple):
@@ -49,7 +50,10 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
         data_load_test = data[1]
     lr = 1e-3
     if optimize == torch.optim.SGD or optimize == torch.optim.ASGD:
-        lr = 1e-4
+        if isinstance(error_func, nn.BCEWithLogitsLoss):
+            lr = 1e-2
+        else:
+            lr = 1e-4
     model = base_model
     for i in range(num_test):
         if base_model == None:
@@ -69,6 +73,11 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
             file.write(f"Model String: {model_str}\nModel Accuracy: {acc}\nEpochs Ran: {j}\nOptimizer: {optimize}\nLearning Rate: {lr}\nError Function: {error_func}")
             
 if __name__ == "__main__":
-    data = make_regression(n_samples = 5000, n_features=100, n_informative=10)
-    run_tests(data, 'cuda', 1, 25,   100, nn.MSELoss(), torch.optim.SGD, activation_pool, f".\\regression")
+    data = make_classification(n_samples = 5000, n_features=100, n_informative=10)
+    data_set_train = GeneratedDataset(data[0][int(len(data[0])*.2):], data[1][int(len(data[1])*.2):])
+    data_set_test = GeneratedDataset(data[0][:int(len(data[0])*.2)], data[1][:int(len(data[1])*.2)])
+    data_load_train = DataLoader(data_set_train, batch_size=50, shuffle=True)
+    data_load_test = DataLoader(data_set_test, batch_size=50, shuffle=True)
+    data = (data_load_train, data_load_test)
+    run_tests(data, 'cuda', 1, 25,   0.2, nn.BCEWithLogitsLoss(), torch.optim.SGD, activation_pool, f".\\regression")
     print("Hello world")

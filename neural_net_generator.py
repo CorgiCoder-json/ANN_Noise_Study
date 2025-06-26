@@ -13,6 +13,7 @@ import random
 import concurrent
 import copy
 import os
+import time
 from AI_weight_generation import run_tests
 
 def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> dict[int, tuple[DataLoader, DataLoader]]:
@@ -31,22 +32,10 @@ def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> di
         preped_data.update({int(row_amount): (train_loader, test_loader)})
     return preped_data
 
-def custom_train(model: util.NetworkSkeleton, prep_data: tuple[DataLoader, DataLoader], row_count: int, optim, err, problem: str, epochs: int):
-    for epoch in range(epochs):
-        util.train(prep_data[0], model, err, optim, 'cpu')
-        # save_model parameters
-        util.test(prep_data[1], model, err, 'cpu')
-    #open matadata file in write:
-        # record final accuarcy
-        # record optimizer
-        # record loss function
-    # DONT SAVE NEURON AS REGRESSION DATA; can be done post model training. Make a seperate saving folder
-        
-
 if __name__ == "__main__":
     classification_dict = {'relu': nn.ReLU(), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh(), 'silu': nn.SiLU()}
     regression_dict = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
-    num_tests = 1
+    num_tests = 30
     in_dim = 100
     num_hidden = [0, 1, 2]
     labels = [2000, 5000, 7000, 10000, 12000, 15000, 17000, 20000]
@@ -84,7 +73,7 @@ if __name__ == "__main__":
     class_data = prep(class_files, 0.2)
     all_files = copy.deepcopy(regress_files)
     all_files.extend(class_files)
-    model_id = 3
+    model_id = 0
     for i in range(model_id, model_id + num_tests):
         print(f"Entering Testing loop for try {i}")
         class_str = util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range)
@@ -106,5 +95,8 @@ if __name__ == "__main__":
             for future in concurrent.futures.as_completed(futures):
                 print("Gathering all the data...")
                 future.result()
+        print(f"End of round {i}")
+        if i % 5 == 0:
+            time.sleep(300)
         model_id += 1
     print("Exited! check the results to ensure correct output")
