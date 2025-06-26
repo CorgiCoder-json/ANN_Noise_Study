@@ -45,7 +45,9 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
     if isinstance(data, tuple):
         data_load_train = data[0]
         data_load_test = data[1]
-    lr = 1e-4
+    lr = 1e-3
+    if isinstance(optimize, torch.optim.SGD) or isinstance(optimize, torch.optim.ASGD):
+        lr = 1e-4
     model = base_model
     for i in range(num_test):
         if base_model == None:

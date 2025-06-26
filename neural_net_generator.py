@@ -46,6 +46,7 @@ def custom_train(model: util.NetworkSkeleton, prep_data: tuple[DataLoader, DataL
 if __name__ == "__main__":
     classification_dict = {'relu': nn.ReLU(), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh(), 'silu': nn.SiLU()}
     regression_dict = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
+    num_tests = 1
     in_dim = 100
     num_hidden = [0, 1, 2]
     labels = [2000, 5000, 7000, 10000, 12000, 15000, 17000, 20000]
@@ -83,8 +84,8 @@ if __name__ == "__main__":
     class_data = prep(class_files, 0.2)
     all_files = copy.deepcopy(regress_files)
     all_files.extend(class_files)
-    model_id = 0
-    for i in range(1):
+    model_id = 1
+    for i in range(model_id, model_id + num_tests):
         print(f"Entering Testing loop for try {i}")
         class_str = util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range)
         regress_str = util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(regression_dict.keys()), size_range)
