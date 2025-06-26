@@ -1,4 +1,6 @@
 from sklearn.datasets import make_regression
+import torch.optim.sgd
+import torch.optim.sgd
 from model_utils import save_model_parameters, save_network_heatmap, create_layers, model_string_generator, train, test, model_str_file_name, NetworkSkeleton
 import torch
 import torch.nn as nn
@@ -46,7 +48,8 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
         data_load_train = data[0]
         data_load_test = data[1]
     lr = 1e-3
-    if isinstance(optimize, torch.optim.SGD) or isinstance(optimize, torch.optim.ASGD):
+    print(optimize.__class__.__name__)
+    if optimize == torch.optim.SGD or optimize == torch.optim.ASGD:
         lr = 1e-4
     model = base_model
     for i in range(num_test):
@@ -68,5 +71,6 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
             
 if __name__ == "__main__":
     data = make_regression(n_samples = 5000, n_features=100, n_informative=10)
-    run_tests(data, 'cuda', 1, 25,   100, nn.MSELoss(), torch.optim.SGD, activation_pool)
+    print(type(torch.optim.Adam))
+    run_tests(data, 'cuda', 1, 25,   100, nn.MSELoss(), torch.optim.SGD, activation_pool, f".\\regression")
     print("Hello world")
