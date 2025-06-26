@@ -48,7 +48,6 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
         data_load_train = data[0]
         data_load_test = data[1]
     lr = 1e-3
-    print(optimize.__class__.__name__)
     if optimize == torch.optim.SGD or optimize == torch.optim.ASGD:
         lr = 1e-4
     model = base_model
@@ -67,10 +66,9 @@ def run_tests(data, device, num_test, epochs, min_error, error_func, optimize, a
             j += 1
         save_model_parameters(model, model_str, insert_path, 'post', device)
         with open(path.join(insert_path, model_str_file_name(model_str) + "_report.txt"), 'wt') as file:
-            file.write(f"Model String: {model_str}\nModel Accuracy: {acc}\nEpochs Ran: {j}\nOptimizer: {optimize}\nLearning Rate: {1e-4}\nError Function: {error_func}")
+            file.write(f"Model String: {model_str}\nModel Accuracy: {acc}\nEpochs Ran: {j}\nOptimizer: {optimize}\nLearning Rate: {lr}\nError Function: {error_func}")
             
 if __name__ == "__main__":
     data = make_regression(n_samples = 5000, n_features=100, n_informative=10)
-    print(type(torch.optim.Adam))
     run_tests(data, 'cuda', 1, 25,   100, nn.MSELoss(), torch.optim.SGD, activation_pool, f".\\regression")
     print("Hello world")

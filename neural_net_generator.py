@@ -84,7 +84,7 @@ if __name__ == "__main__":
     class_data = prep(class_files, 0.2)
     all_files = copy.deepcopy(regress_files)
     all_files.extend(class_files)
-    model_id = 2
+    model_id = 3
     for i in range(model_id, model_id + num_tests):
         print(f"Entering Testing loop for try {i}")
         class_str = util.model_string_generator(in_dim, random.choice(num_hidden), num_out, list(classification_dict.keys()), size_range)
