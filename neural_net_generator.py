@@ -35,7 +35,7 @@ def prep(files_list: list[str], test_percent: float, batch_size: int = 50) -> di
 if __name__ == "__main__":
     classification_dict = {'relu': nn.ReLU(), 'sig': nn.Sigmoid(), 'tanh': nn.Tanh(), 'silu': nn.SiLU()}
     regression_dict = {'relu': nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
-    num_tests = 30
+    num_tests = 100
     in_dim = 100
     num_hidden = [0, 1, 2]
     labels = [2000, 5000, 7000, 10000, 12000, 15000, 17000, 20000]
@@ -97,6 +97,6 @@ if __name__ == "__main__":
                 future.result()
         print(f"End of round {i}")
         if i % 5 == 0:
-            time.sleep(300)
+            time.sleep(120)
         model_id += 1
     print("Exited! check the results to ensure correct output")
