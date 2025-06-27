@@ -11,6 +11,8 @@ class Report:
     optimizer: str
     learning_rate: float
     error_function: str
+    def __str__(self):
+        return f"Model String: {self.model_str}\nOptimizer Used: {self.optimizer}\nError Function: {self.error_function}\nLearning Rate: {self.learning_rate}\nEpochs Ran: {self.epochs}\nAccuracy: {self.accuracy}"
 
 
 def sort_pre_post(files)-> tuple[list[str], list[str]]:
@@ -39,7 +41,8 @@ def open_log(base_path, layer_files):
             break
     with open(file_str, 'r') as f:
         lines = f.readlines()
-        report_obj: Report = Report(lines[0].strip().split()[-1], float(lines[1].strip().split()[-1]), int(lines[2].strip().split()[-1]), lines[3].strip().split()[-1], float(lines[4].strip().split()[-1]), lines[5].strip().split()[-1])
+        print(lines[4].strip().split(":")[-1])
+        report_obj: Report = Report(lines[0].strip().split(":")[-1].strip(), float(lines[1].strip().split(":")[-1]), int(lines[2].strip().split(":")[-1]), lines[3].strip().split(":")[-1].strip(), float(lines[4].strip().split(":")[-1]), lines[5].strip().split(":")[-1].strip())
         return report_obj
         
 
@@ -51,7 +54,8 @@ if __name__ =='__main__':
         directories.append(dirs)
         file_names.append(files)
         break
-    open_log(model_path, file_names[0])
+    logs = open_log(model_path, file_names[0])
+    print(logs)
     pre_train, post_train = sort_pre_post(file_names[0])
     pre_net = open_network(model_path, pre_train)
     post_net = open_network(model_path, post_train)
