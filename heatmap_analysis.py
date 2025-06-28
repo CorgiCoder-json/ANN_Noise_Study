@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import os
 from dataclasses import dataclass
 
+from torch import gather
+
 @dataclass
 class Report:
     model_str: str
@@ -41,12 +43,25 @@ def open_log(base_path, layer_files):
             break
     with open(file_str, 'r') as f:
         lines = f.readlines()
-        print(lines[4].strip().split(":")[-1])
         report_obj: Report = Report(lines[0].strip().split(":")[-1].strip(), float(lines[1].strip().split(":")[-1]), int(lines[2].strip().split(":")[-1]), lines[3].strip().split(":")[-1].strip(), float(lines[4].strip().split(":")[-1]), lines[5].strip().split(":")[-1].strip())
         return report_obj
+
+def gather_dataset_paths(fpath):
+    model_paths = []
+    for root, dirs, files in os.walk(fpath):
+        for dir in dirs:
+            model_paths.append(fpath + "\\" + dir)
+        break
+    return model_paths
         
 
+def gather_data(class_path, regress_path):
+    model_dirs_regress = gather_dataset_paths(regress_path)
+    model_dirs_class = gather_dataset_paths(class_path)
+
 if __name__ =='__main__':
+    class_path = "D:\\model_dataset\\classification"
+    regress_path = "D:\\model_dataset\\regression"
     model_path = "D:\\model_dataset\\classification\\2000_rows\\model_1"
     roots, directories, file_names = [], [], []
     for root, dirs, files in os.walk(model_path):
@@ -54,6 +69,7 @@ if __name__ =='__main__':
         directories.append(dirs)
         file_names.append(files)
         break
+    gather_data(class_path, regress_path)
     logs = open_log(model_path, file_names[0])
     print(logs)
     pre_train, post_train = sort_pre_post(file_names[0])
