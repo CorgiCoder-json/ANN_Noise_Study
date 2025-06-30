@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 import os
 from dataclasses import dataclass
 
-from torch import gather
-
 @dataclass
 class Report:
     model_str: str
@@ -16,6 +14,11 @@ class Report:
     def __str__(self):
         return f"Model String: {self.model_str}\nOptimizer Used: {self.optimizer}\nError Function: {self.error_function}\nLearning Rate: {self.learning_rate}\nEpochs Ran: {self.epochs}\nAccuracy: {self.accuracy}"
 
+class MemModel:
+    def __init__(self, fpath):
+        self.model_path = fpath
+    def load_model(self):
+        return pd.read_csv(self.model_path)
 
 def sort_pre_post(files)-> tuple[list[str], list[str]]:
     pre_files = []
@@ -53,11 +56,13 @@ def gather_dataset_paths(fpath):
             model_paths.append(fpath + "\\" + dir)
         break
     return model_paths
-        
 
 def gather_data(class_path, regress_path):
-    model_dirs_regress = gather_dataset_paths(regress_path)
-    model_dirs_class = gather_dataset_paths(class_path)
+    model_dirs_regress = gather_dataset_paths(gather_dataset_paths(regress_path))
+    model_dirs_class = gather_dataset_paths(gather_dataset_paths(class_path))
+    for model_dir in model_dirs_regress:
+        
+        
 
 if __name__ =='__main__':
     class_path = "D:\\model_dataset\\classification"
