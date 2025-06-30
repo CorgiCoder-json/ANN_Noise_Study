@@ -61,31 +61,47 @@ def gather_data(class_path, regress_path):
     model_dirs_regress = gather_dataset_paths(gather_dataset_paths(regress_path))
     model_dirs_class = gather_dataset_paths(gather_dataset_paths(class_path))
     for model_dir in model_dirs_regress:
-        
+        pass
         
 
 if __name__ =='__main__':
-    class_path = "D:\\model_dataset\\classification"
-    regress_path = "D:\\model_dataset\\regression"
-    model_path = "D:\\model_dataset\\classification\\2000_rows\\model_1"
-    roots, directories, file_names = [], [], []
-    for root, dirs, files in os.walk(model_path):
-        roots.append(root)
-        directories.append(dirs)
-        file_names.append(files)
+    # class_path = "D:\\model_dataset\\classification"
+    # regress_path = "D:\\model_dataset\\regression"
+    # model_path = "D:\\model_dataset\\classification\\2000_rows\\model_1"
+    # roots, directories, file_names = [], [], []
+    # for root, dirs, files in os.walk(model_path):
+    #     roots.append(root)
+    #     directories.append(dirs)
+    #     file_names.append(files)
+    #     break
+    # gather_data(class_path, regress_path)
+    # logs = open_log(model_path, file_names[0])
+    # print(logs)
+    # pre_train, post_train = sort_pre_post(file_names[0])
+    # pre_net = open_network(model_path, pre_train)
+    # post_net = open_network(model_path, post_train)
+    # fig, axs = plt.subplots(1,3)
+    # im1 = axs[0].imshow(pre_net[4].to_numpy())
+    # im2 = axs[1].imshow(post_net[4].to_numpy())
+    # im3 = axs[2].imshow((post_net[4].to_numpy() - pre_net[4].to_numpy()))
+    # fig.colorbar(im1, ax=axs[0])
+    # fig.colorbar(im2, ax=axs[1])
+    # fig.colorbar(im3, ax=axs[2])    
+    # plt.show()
+    
+    main_path = "D:\\pass_grad_alt_model\\regression_test_1\\weights"
+    fpaths = []
+    file_names = []
+    for root, dirs, files in os.walk(main_path):
+        for file in files:
+            file_names.append(file)
+            fpaths.append(main_path + "\\" + file)
         break
-    gather_data(class_path, regress_path)
-    logs = open_log(model_path, file_names[0])
-    print(logs)
-    pre_train, post_train = sort_pre_post(file_names[0])
-    pre_net = open_network(model_path, pre_train)
-    post_net = open_network(model_path, post_train)
-    fig, axs = plt.subplots(1,3)
-    im1 = axs[0].imshow(pre_net[4].to_numpy())
-    im2 = axs[1].imshow(post_net[4].to_numpy())
-    im3 = axs[2].imshow((post_net[4].to_numpy() - pre_net[4].to_numpy()))
-    fig.colorbar(im1, ax=axs[0])
-    fig.colorbar(im2, ax=axs[1])
-    fig.colorbar(im3, ax=axs[2])    
-    plt.show()
+    for i, path in enumerate(fpaths):
+        weights = pd.read_csv(path)
+        plt.imshow(weights)
+        plt.title(file_names[i])
+        plt.colorbar()
+        plt.show()
+    
     print("Hello World")

@@ -43,6 +43,30 @@ def apply_eye_shape(model: NetworkSkeleton):
             print("No second dimension, obviously too small")
     model.load_state_dict(state_copy)
 
+def apply_staircase_shape(model: NetworkSkeleton, diag_len: int = 3, descend: bool = False):
+    state_copy = copy.deepcopy(model.cpu().state_dict())
+    for key in state_copy:
+        try:
+            if state_copy[key].numpy().shape[1] <= 2:
+                print("too small!")
+            weight_numpy = state_copy[key].numpy()
+            x_init = random.randint(0+diag_len, weight_numpy.shape[0]-1) if not descend else random.randint(0, weight_numpy.shape[0]-1-diag_len)
+            y_init = random.randint(0, weight_numpy.shape[1]-1-diag_len)
+            for i in reversed(range(diag_len)):
+                weight_numpy[x_init][y_init] *= -1
+                weight_numpy[x_init][y_init+1] *= -1
+                if not descend:
+                    x_init -= 1
+                else:
+                    x_init += 1
+                y_init += 1
+            state_copy[key] = torch.from_numpy(weight_numpy)
+        except Exception as e:
+            print(e)
+            print("Dimensions were too small to apply shape")
+    model.load_state_dict(state_copy)
+            
+
 def randomize_final_layer(model: NetworkSkeleton):
     state_copy = copy.deepcopy(model.cpu().state_dict())
     final_key = list(state_copy.keys())[-2]
@@ -62,17 +86,18 @@ def display_net(state_dict, tracker):
 if __name__ == "__main__":
     epochs = 8
     tracker = 0
-    loss = nn.L1Loss()
+    loss = nn.MSELoss()
+    shape_funcs = [apply_eye_shape, apply_staircase_shape]
+    num_shapes = 50
     activation_list = {"relu": nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
     model_str = model_string_generator(100, 1, 1, list(activation_list.keys()), (100, 300))
     print(f"Model String: {model_str}")
     base_model = NetworkSkeleton(create_layers(model_str,activation_list))
     make_net_blank(base_model)
-    apply_eye_shape(base_model)
-    apply_eye_shape(base_model)
-    apply_eye_shape(base_model)
-    # randomize_final_layer(base_model)
-    optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-3)
+    for i in range(num_shapes):
+        random.choice(shape_funcs)(base_model)
+    randomize_final_layer(base_model)
+    optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-2)
     dataset = pd.read_csv("generated_data_sets/17000_100_10_regression_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
