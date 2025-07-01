@@ -30,11 +30,12 @@ class MemModel:
                         weights.append(pd.read_csv(self.model_path + "\\" + file))
                     if "bias" in file:
                         biases.append(pd.read_csv(self.model_path + "\\" + file))
-                else:
+                elif "post" in file:
                     if "weight" in file:
                         weights.append(pd.read_csv(self.model_path + "\\" + file))
                     if "bias" in file:
                         biases.append(pd.read_csv(self.model_path + "\\" + file))
+            break
         return weights, biases
     def load_training_model(self):
         pass
@@ -104,6 +105,18 @@ if __name__ =='__main__':
         logs = open_log(model.model_path)
         weights_pre, biases_pre = model.load_base_model()
         weights_post, biases_post = model.load_base_model(False)
+        fig_num = 0 
+        for index, weight in enumerate(weights_pre):
+            fig = plt.figure(fig_num)
+            plt.imshow(weight)
+            plt.colorbar()
+            plt.title(f"{logs.model_str} Heatmap Layer {index} Pre")
+            fig_num += 1
+            fig = plt.figure(fig_num)
+            plt.imshow(weights_post[index])
+            plt.colorbar()
+            plt.title(f"{logs.model_str} Heatmap Layer {index} Post")
         print(logs)   
         plt.show()
+        
         
