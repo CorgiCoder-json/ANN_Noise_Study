@@ -17,8 +17,27 @@ class Report:
 class MemModel:
     def __init__(self, fpath):
         self.model_path = fpath
-    def load_model(self):
-        return pd.read_csv(self.model_path)
+        self.training_path = fpath + "\\training"
+    def load_base_model(self, pre_train: bool = True):
+        weights = [] 
+        biases = []
+        for root, dir, files in os.walk(self.model_path):
+            for file in files:
+                if file.split('.')[-1] != 'csv':
+                    continue
+                elif pre_train and "pre" in file:
+                    if "weight" in file:
+                        weights.append(pd.read_csv(self.model_path + "\\" + file))
+                    if "bias" in file:
+                        biases.append(pd.read_csv(self.model_path + "\\" + file))
+                else:
+                    if "weight" in file:
+                        weights.append(pd.read_csv(self.model_path + "\\" + file))
+                    if "bias" in file:
+                        biases.append(pd.read_csv(self.model_path + "\\" + file))
+        return weights, biases
+    def load_training_model(self):
+        pass
 
 def sort_pre_post(files)-> tuple[list[str], list[str]]:
     pre_files = []
@@ -65,8 +84,13 @@ def gather_model_paths(class_path, regress_path):
     for index, model_dir in enumerate(data_dirs_regress):
         model_dirs_regress.extend(step_file_system(model_dir))
         model_dirs_class.extend(step_file_system(data_dirs_class[index]))
+    return model_dirs_regress, model_dirs_class
     
-def load_references()
+def load_references(model_dirs):
+    model_classes = []
+    for model_dir in model_dirs:
+        model_classes.append(MemModel(model_dir))
+    return model_classes
 
 if __name__ =='__main__':
     class_path = "D:\\model_dataset\\classification"
@@ -78,7 +102,9 @@ if __name__ =='__main__':
         directories.append(dirs)
         file_names.append(files)
         break
-    gather_data(class_path, regress_path)
+    model_paths = gather_model_paths(class_path, regress_path)
+    class_models = load_references(model_paths[1])
+    regress_models = load_references(model_paths[0])
     logs = open_log(model_path, file_names[0])
     print(logs)
     pre_train, post_train = sort_pre_post(file_names[0])
