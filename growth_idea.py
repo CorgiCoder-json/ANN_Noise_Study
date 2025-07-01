@@ -40,7 +40,7 @@ def apply_eye_shape(model: NetworkSkeleton):
                 temp_mat[x_coord_pupil-1][y_coord_pupil-1] *= -.5
                 state_copy[key] = torch.from_numpy(temp_mat)
         except:
-            print("No second dimension, obviously too small")
+            pass
     model.load_state_dict(state_copy)
 
 def apply_staircase_shape(model: NetworkSkeleton, diag_len: int = 3, descend: bool = False):
@@ -62,8 +62,7 @@ def apply_staircase_shape(model: NetworkSkeleton, diag_len: int = 3, descend: bo
                 y_init += 1
             state_copy[key] = torch.from_numpy(weight_numpy)
         except Exception as e:
-            print(e)
-            print("Dimensions were too small to apply shape")
+            pass
     model.load_state_dict(state_copy)
             
 
@@ -86,19 +85,23 @@ def display_net(state_dict, tracker):
 if __name__ == "__main__":
     epochs = 8
     tracker = 0
-    loss = nn.MSELoss()
+    loss = nn.BCEWithLogitsLoss()
     shape_funcs = [apply_eye_shape, apply_staircase_shape]
-    num_shapes = 50
-    activation_list = {"relu": nn.ReLU(), 'silu': nn.SiLU(), 'llrelu': nn.LeakyReLU(0.01), 'hlrelu': nn.LeakyReLU(1.01)}
+    num_shapes = 100
+    activation_list = {"sig": nn.Sigmoid(), 'tanh': nn.Tanh(), 'relu': nn.ReLU(), 'silu': nn.SiLU()}
     model_str = model_string_generator(100, 1, 1, list(activation_list.keys()), (100, 300))
     print(f"Model String: {model_str}")
     base_model = NetworkSkeleton(create_layers(model_str,activation_list))
     make_net_blank(base_model)
     for i in range(num_shapes):
-        random.choice(shape_funcs)(base_model)
-    randomize_final_layer(base_model)
-    optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-2)
-    dataset = pd.read_csv("generated_data_sets/17000_100_10_regression_generated.csv")
+        choice = random.choice(shape_funcs)
+        if choice == apply_staircase_shape:
+            choice(base_model, random.randint(3, 13))
+        else:
+            choice(base_model)
+    # randomize_final_layer(base_model)
+    optimizer = torch.optim.RMSprop(base_model.parameters(), lr=1e-3)
+    dataset = pd.read_csv("generated_data_sets/7000_100_10_classification_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
     y_vals =  dataset[dataset.columns[dataset.columns == 'y']].to_numpy()
