@@ -30,7 +30,7 @@ class MemModel:
                         weights.append(pd.read_csv(self.model_path + "\\" + file))
                     if "bias" in file:
                         biases.append(pd.read_csv(self.model_path + "\\" + file))
-                elif "post" in file:
+                elif not pre_train and "post" in file:
                     if "weight" in file:
                         weights.append(pd.read_csv(self.model_path + "\\" + file))
                     if "bias" in file:
@@ -39,24 +39,6 @@ class MemModel:
         return weights, biases
     def load_training_model(self):
         pass
-
-def sort_pre_post(files)-> tuple[list[str], list[str]]:
-    pre_files = []
-    post_files = []
-    for file in files:
-        if "pre" in file:
-            pre_files.append(file)
-        elif "post" in file:
-            post_files.append(file)        
-        else:
-            print("Other file found... possibly report file?")
-    return pre_files, post_files
-
-def open_network(base_path, layer_files):
-    network = []
-    for file in layer_files:
-        network.append(pd.read_csv(base_path+"\\"+file))
-    return network
 
 def open_log(base_path):
     file_str = ""
@@ -103,6 +85,7 @@ if __name__ =='__main__':
     regress_models = load_references(model_paths[0])
     for model in class_models:
         logs = open_log(model.model_path)
+        print(logs.model_str) 
         weights_pre, biases_pre = model.load_base_model()
         weights_post, biases_post = model.load_base_model(False)
         fig_num = 0 
@@ -110,13 +93,12 @@ if __name__ =='__main__':
             fig = plt.figure(fig_num)
             plt.imshow(weight)
             plt.colorbar()
-            plt.title(f"{logs.model_str} Heatmap Layer {index} Pre")
+            plt.title(f"Heatmap Layer {index} Pre")
             fig_num += 1
             fig = plt.figure(fig_num)
             plt.imshow(weights_post[index])
             plt.colorbar()
-            plt.title(f"{logs.model_str} Heatmap Layer {index} Post")
-        print(logs)   
-        plt.show()
-        
-        
+            plt.title(f"Heatmap Layer {index} Post")
+            fig_num += 1
+        print(logs)  
+        plt.show() 
