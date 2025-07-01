@@ -57,12 +57,14 @@ def open_network(base_path, layer_files):
         network.append(pd.read_csv(base_path+"\\"+file))
     return network
 
-def open_log(base_path, layer_files):
+def open_log(base_path):
     file_str = ""
-    for file in layer_files:
-        if "report" in file:
-            file_str = base_path + '\\' + file
-            break
+    for root, dirs, files in os.walk(base_path):
+        for file in files:
+            if "report" in file:
+                file_str = base_path + '\\' + file
+                break
+        break
     with open(file_str, 'r') as f:
         lines = f.readlines()
         report_obj: Report = Report(lines[0].strip().split(":")[-1].strip(), float(lines[1].strip().split(":")[-1]), int(lines[2].strip().split(":")[-1]), lines[3].strip().split(":")[-1].strip(), float(lines[4].strip().split(":")[-1]), lines[5].strip().split(":")[-1].strip())
@@ -95,28 +97,13 @@ def load_references(model_dirs):
 if __name__ =='__main__':
     class_path = "D:\\model_dataset\\classification"
     regress_path = "D:\\model_dataset\\regression"
-    model_path = "D:\\model_dataset\\classification\\2000_rows\\model_1"
-    roots, directories, file_names = [], [], []
-    for root, dirs, files in os.walk(model_path):
-        roots.append(root)
-        directories.append(dirs)
-        file_names.append(files)
-        break
     model_paths = gather_model_paths(class_path, regress_path)
     class_models = load_references(model_paths[1])
     regress_models = load_references(model_paths[0])
-    logs = open_log(model_path, file_names[0])
-    print(logs)
-    pre_train, post_train = sort_pre_post(file_names[0])
-    pre_net = open_network(model_path, pre_train)
-    post_net = open_network(model_path, post_train)
-    fig, axs = plt.subplots(1,3)
-    im1 = axs[0].imshow(pre_net[4].to_numpy())
-    im2 = axs[1].imshow(post_net[4].to_numpy())
-    im3 = axs[2].imshow((post_net[4].to_numpy() - pre_net[4].to_numpy()))
-    fig.colorbar(im1, ax=axs[0])
-    fig.colorbar(im2, ax=axs[1])
-    fig.colorbar(im3, ax=axs[2])    
-    plt.show()
-    
-    print("Hello World")
+    for model in class_models:
+        logs = open_log(model.model_path)
+        weights_pre, biases_pre = model.load_base_model()
+        weights_post, biases_post = model.load_base_model(False)
+        print(logs)   
+        plt.show()
+        
