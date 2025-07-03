@@ -87,8 +87,8 @@ if __name__ == "__main__":
     tracker = 0
     loss = nn.BCEWithLogitsLoss()
     shape_funcs = [apply_eye_shape, apply_staircase_shape]
-    num_shapes = 100
-    activation_list = {"sig": nn.Sigmoid(), 'tanh': nn.Tanh(), 'relu': nn.ReLU(), 'silu': nn.SiLU()}
+    num_shapes = 40
+    activation_list = {"sig": nn.Sigmoid(), 'tanh': nn.Tanh()}
     model_str = model_string_generator(100, 1, 1, list(activation_list.keys()), (100, 300))
     print(f"Model String: {model_str}")
     base_model = NetworkSkeleton(create_layers(model_str,activation_list))
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         else:
             choice(base_model)
     # randomize_final_layer(base_model)
-    optimizer = torch.optim.RMSprop(base_model.parameters(), lr=1e-3)
+    optimizer = torch.optim.SGD(base_model.parameters(), lr=7e-1)
     dataset = pd.read_csv("generated_data_sets/7000_100_10_classification_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
