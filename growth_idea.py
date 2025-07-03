@@ -3,6 +3,7 @@ Created: 6/28/2025
 
 Purpose: Test a system where weights are the same except for a shape, seeing how the shape effects the network
 """
+from networkx import generate_gexf
 from model_utils import model_string_generator, create_layers, NetworkSkeleton, GeneratedDataset, train, test
 import torch
 import torch.nn as nn
@@ -12,6 +13,28 @@ import copy
 import random
 import pandas as pd
 import matplotlib.pyplot as plt
+
+class Shape:
+    def __init__(self, shape_array: list[list[float]], shape_center: tuple[int, int], placement_coords: None | tuple[int, int] = None, layer_limit: None | list[int] = None):
+        self.template = np.array(shape_array)
+        self.template_center = shape_center
+        self.set_coordinates = placement_coords
+        self.layer_limits = layer_limit
+    def apply_to_model(self, model: NetworkSkeleton):
+        state_copy = copy.deepcopy(model.cpu().state_dict())
+        layer_tracker = 1
+        for key in state_copy:
+            if "weight" in key:
+                if (1 in state_copy[key].numpy().shape and self.template.shape[0] != 1) or (self.layer_limits is not None and layer_tracker not in self.layer_limits):
+                    continue
+                else:
+                    if self.set_coordinates == None:
+                        gen_x = random.randint(self.template_center[0], self.template_center[0] - self.template.shape[0])
+                        gen_y = 
+                        self.set_coordinates = 
+            else:
+                layer_tracker += 1
+        pass
 
 def make_net_blank(network: NetworkSkeleton):
     state_copy = copy.deepcopy(network.cpu().state_dict())
