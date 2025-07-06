@@ -3,6 +3,7 @@ Created: 6/28/2025
 
 Purpose: Test a system where weights are the same except for a shape, seeing how the shape effects the network
 """
+from unittest.main import MODULE_EXAMPLES
 from networkx import generate_gexf
 from model_utils import model_string_generator, create_layers, NetworkSkeleton, GeneratedDataset, train, test
 import torch
@@ -23,18 +24,26 @@ class Shape:
     def apply_to_model(self, model: NetworkSkeleton):
         state_copy = copy.deepcopy(model.cpu().state_dict())
         layer_tracker = 1
+        was_none = True if self.set_coordinates is None else False
         for key in state_copy:
             if "weight" in key:
                 if (1 in state_copy[key].numpy().shape and self.template.shape[0] != 1) or (self.layer_limits is not None and layer_tracker not in self.layer_limits):
                     continue
                 else:
                     if self.set_coordinates == None:
-                        gen_x = random.randint(self.template_center[0], self.template_center[0] - self.template.shape[0])
-                        gen_y = 
-                        self.set_coordinates = 
+                        gen_x = random.randint(self.template_center[0], len(state_copy[key].numpy()) - 1 - self.template.shape[0] - self.template_center[0])
+                        gen_y = random.randint(self.template_center[1], len(state_copy[key].numpy()[0]) - 1 - self.template[0].shape[0] - self.template_center[1])
+                        self.set_coordinates = (gen_x, gen_y)
+                    for i in range(len(self.template)):
+                        for j, item in enumerate(self.template[i]):
+                            model_x = self.set_coordinates[0] - (self.template_center[0] - i)
+                            model_y = self.set_coordinates[1] - (self.template_center[1] - j)
+                            state_copy[key].numpy()[model_x][model_y] *= self.template[i][j]
             else:
                 layer_tracker += 1
-        pass
+        if was_none:
+            self.set_coordinates = None
+        model.load_state_dict(state_copy)
 
 def make_net_blank(network: NetworkSkeleton):
     state_copy = copy.deepcopy(network.cpu().state_dict())
@@ -106,6 +115,10 @@ def display_net(state_dict, tracker):
     plt.show()
 
 if __name__ == "__main__":
+    inv_eye_pattern = [[-1,-1,-1], [-1,-0.5,-1], [-1,-1,-1]]
+    eye_pattern = [[-0.5,-0.5,-0.5], [-0.5,-1,-0.5], [-0.5,-0.5,-0.5]]
+    eye_shape = Shape(eye_pattern, (1, 1), None, [1])
+    inv_eye_shape = Shape(inv_eye_pattern, (1, 1), None, [2])
     epochs = 8
     tracker = 0
     loss = nn.BCEWithLogitsLoss()
@@ -116,14 +129,10 @@ if __name__ == "__main__":
     print(f"Model String: {model_str}")
     base_model = NetworkSkeleton(create_layers(model_str,activation_list))
     make_net_blank(base_model)
-    for i in range(num_shapes):
-        choice = random.choice(shape_funcs)
-        if choice == apply_staircase_shape:
-            choice(base_model, random.randint(3, 13))
-        else:
-            choice(base_model)
-    # randomize_final_layer(base_model)
-    optimizer = torch.optim.SGD(base_model.parameters(), lr=7e-1)
+    for i in range(100):
+        eye_shape.apply_to_model(base_model)
+        inv_eye_shape.apply_to_model(base_model)
+    optimizer = torch.optim.SGD(base_model.parameters(), lr=1e-2)
     dataset = pd.read_csv("generated_data_sets/7000_100_10_classification_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
