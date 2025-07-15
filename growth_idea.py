@@ -32,7 +32,7 @@ class Shape:
                 else:
                     if self.set_coordinates == None:
                         gen_x = random.randint(self.template_center[0], len(state_copy[key].numpy()) - 1 - self.template.shape[0] - self.template_center[0])
-                        gen_y = random.randint(self.template_center[1], len(state_copy[key].numpy()[0]) - 1 - self.template[0].shape[0] - self.template_center[1])
+                        gen_y = random.randint(self.template_center[1], len(state_copy[key].numpy()[0]) - 1 - self.template.shape[1] - self.template_center[1])
                         self.set_coordinates = (gen_x, gen_y)
                     for i in range(len(self.template)):
                         for j, item in enumerate(self.template[i]):
@@ -41,8 +41,8 @@ class Shape:
                             state_copy[key].numpy()[model_x][model_y] *= self.template[i][j]
             else:
                 layer_tracker += 1
-        if was_none:
-            self.set_coordinates = None
+            if was_none:
+                self.set_coordinates = None
         model.load_state_dict(state_copy)
 
 def make_net_blank(network: NetworkSkeleton):
@@ -116,13 +116,15 @@ def display_net(state_dict, tracker):
 if __name__ == "__main__":
     inv_eye_pattern = [[-1,-1,-1], [-1,-0.5,-1], [-1,-1,-1]]
     eye_pattern = [[-0.5,-0.5,-0.5], [-0.5,-1,-0.5], [-0.5,-0.5,-0.5]]
+    random_pattern = (-1 * np.random.random((2, 4))).tolist()
     eye_shape = Shape(eye_pattern, (1, 1), None, [1])
     inv_eye_shape = Shape(inv_eye_pattern, (1, 1), None, [2])
+    random_shape = Shape(random_pattern, (1, 3), None, [1, 2])
     epochs = 8
     tracker = 0
     loss = nn.BCEWithLogitsLoss()
     shape_funcs = [apply_eye_shape, apply_staircase_shape]
-    num_shapes = 20
+    num_shapes = 40
     activation_list = {"sig": nn.Sigmoid(), 'tanh': nn.Tanh()}
     model_str = '100|200->sig->200|150->tanh->150|1'
     print(f"Model String: {model_str}")
@@ -131,11 +133,12 @@ if __name__ == "__main__":
     for i in range(num_shapes):
         eye_shape.apply_to_model(base_model)
         inv_eye_shape.apply_to_model(base_model)
+        random_shape.apply_to_model(base_model)
     sgd_copy = copy.deepcopy(base_model)
     rms_copy = copy.deepcopy(base_model)
-    optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-2)
-    optimizer_sgd = torch.optim.SGD(sgd_copy.parameters(), 2e-1)
-    optimizer_rms = torch.optim.RMSprop(rms_copy.parameters(), 1e-2)
+    optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-3)
+    optimizer_sgd = torch.optim.SGD(sgd_copy.parameters(), 1e-2)
+    optimizer_rms = torch.optim.RMSprop(rms_copy.parameters(), 1e-3)
     dataset = pd.read_csv("generated_data_sets/7000_100_10_classification_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
