@@ -95,8 +95,7 @@ def apply_staircase_shape(model: NetworkSkeleton, diag_len: int = 3, descend: bo
             state_copy[key] = torch.from_numpy(weight_numpy)
         except Exception as e:
             pass
-    model.load_state_dict(state_copy)
-            
+    model.load_state_dict(state_copy)  
 
 def randomize_final_layer(model: NetworkSkeleton):
     state_copy = copy.deepcopy(model.cpu().state_dict())
@@ -123,16 +122,20 @@ if __name__ == "__main__":
     tracker = 0
     loss = nn.BCEWithLogitsLoss()
     shape_funcs = [apply_eye_shape, apply_staircase_shape]
-    num_shapes = 40
+    num_shapes = 20
     activation_list = {"sig": nn.Sigmoid(), 'tanh': nn.Tanh()}
-    model_str = model_string_generator(100, 1, 1, list(activation_list.keys()), (100, 300))
+    model_str = '100|200->sig->200|150->tanh->150|1'
     print(f"Model String: {model_str}")
     base_model = NetworkSkeleton(create_layers(model_str,activation_list))
     make_net_blank(base_model)
-    for i in range(100):
+    for i in range(num_shapes):
         eye_shape.apply_to_model(base_model)
         inv_eye_shape.apply_to_model(base_model)
-    optimizer = torch.optim.SGD(base_model.parameters(), lr=1e-2)
+    sgd_copy = copy.deepcopy(base_model)
+    rms_copy = copy.deepcopy(base_model)
+    optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-2)
+    optimizer_sgd = torch.optim.SGD(sgd_copy.parameters(), 2e-1)
+    optimizer_rms = torch.optim.RMSprop(rms_copy.parameters(), 1e-2)
     dataset = pd.read_csv("generated_data_sets/7000_100_10_classification_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
@@ -145,5 +148,11 @@ if __name__ == "__main__":
     display_net(states, tracker)
     for i in range(epochs):
         train(data_loader_train, base_model, loss, optimizer, 'cpu')
-        print(f"MSE Loss: {test(data_loader_test, base_model, loss, 'cpu')}")
-        display_net(base_model.state_dict(), tracker)
+        print(f"BCE Adam Loss: {test(data_loader_test, base_model, loss, 'cpu')}")
+        train(data_loader_train, sgd_copy, loss, optimizer_sgd, 'cpu')
+        print(f"BCE SGD Loss: {test(data_loader_test, sgd_copy, loss, 'cpu')}")
+        train(data_loader_train, rms_copy, loss, optimizer_rms, 'cpu')
+        print(f"BCE RMSProp Loss: {test(data_loader_test, rms_copy, loss, 'cpu')}")
+    display_net(base_model.state_dict(), tracker)
+    display_net(sgd_copy.state_dict(), tracker)
+    display_net(rms_copy.state_dict(), tracker)
