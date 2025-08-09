@@ -113,6 +113,9 @@ def display_net(state_dict, tracker):
             tracker += 1
     plt.show()
 
+def make_norm(data: pd.DataFrame) -> pd.DataFrame:
+    return (data - data.mean())/data.std()
+
 if __name__ == "__main__":
     inv_eye_pattern = [[-1,-1,-1], [-1,-0.5,-1], [-1,-1,-1]]
     eye_pattern = [[-0.5,-0.5,-0.5], [-0.5,-1,-0.5], [-0.5,-0.5,-0.5]]
@@ -139,7 +142,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(base_model.parameters(), lr=1e-3)
     optimizer_sgd = torch.optim.SGD(sgd_copy.parameters(), 1e-2)
     optimizer_rms = torch.optim.RMSprop(rms_copy.parameters(), 1e-3)
-    dataset = pd.read_csv("generated_data_sets/7000_100_10_classification_generated.csv")
+    dataset = pd.read_csv("generated_data_sets/10000_100_10_classification_generated.csv")
     dataset.drop(dataset.columns[0], axis=1, inplace=True)
     x_vals = dataset[dataset.columns[dataset.columns != 'y']].to_numpy()
     y_vals =  dataset[dataset.columns[dataset.columns == 'y']].to_numpy()

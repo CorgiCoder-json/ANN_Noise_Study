@@ -1,7 +1,12 @@
+from matplotlib.cm import ScalarMappable
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as mlp
 import os
 from dataclasses import dataclass
+import numpy as np
+from skimage.metrics import structural_similarity
+import cv2
 
 @dataclass
 class Report:
@@ -77,28 +82,77 @@ def load_references(model_dirs):
         model_classes.append(MemModel(model_dir))
     return model_classes
 
+def rescale(mat: np.ndarray):
+    # taken from: https://stats.stackexchange.com/questions/587074/whats-the-right-way-to-rescaling-min-max-normalization
+    return (mat - mat.min())/(mat.max() - mat.min()) 
+
+def standard_rescale(mat: np.ndarray):
+    return (mat - mat.mean())/mat.std()
+
 if __name__ =='__main__':
     class_path = "D:\\model_dataset\\classification"
     regress_path = "D:\\model_dataset\\regression"
+    log_path = "D:\\similarity_scores.txt"
     model_paths = gather_model_paths(class_path, regress_path)
     class_models = load_references(model_paths[1])
     regress_models = load_references(model_paths[0])
+    class_models.extend(regress_models) #Comment to cycle through only one group, uncomment to cycle through all
     for model in class_models:
+        temp_similarities = []
         logs = open_log(model.model_path)
         print(logs.model_str) 
         weights_pre, biases_pre = model.load_base_model()
         weights_post, biases_post = model.load_base_model(False)
         fig_num = 0 
         for index, weight in enumerate(weights_pre):
+            #convert matplotlib to cv2: https://stackoverflow.com/questions/42603161/convert-an-image-shown-in-python-into-an-opencv-image
             fig = plt.figure(fig_num)
             plt.imshow(weight)
-            plt.colorbar()
-            plt.title(f"Heatmap Layer {index} Pre")
+            plt.axis('off')
+            fig.canvas.draw()
+            pre_image = cv2.cvtColor(np.asarray(fig.canvas.buffer_rgba()), cv2.COLOR_RGBA2GRAY)
             fig_num += 1
             fig = plt.figure(fig_num)
             plt.imshow(weights_post[index])
-            plt.colorbar()
-            plt.title(f"Heatmap Layer {index} Post")
+            plt.axis('off')
+            fig.canvas.draw()
+            post_image = cv2.cvtColor(np.asarray(fig.canvas.buffer_rgba()), cv2.COLOR_RGBA2GRAY)
             fig_num += 1
-        print(logs)  
-        plt.show() 
+            similar_score = structural_similarity(pre_image, post_image, full=True)
+            temp_similarities.append(similar_score[0]*100)
+            print(f"For layer {index}, the similarity score is: {similar_score[0]*100}")
+            
+            if os.path.exists(log_path):
+                with open(log_path, 'a') as file:
+                    file.write(f"For layer {index}, the similarity score is: {similar_score[0]*100}\n")
+            else:
+                with open(log_path, 'w') as file:
+                    file.write(f"For layer {index}, the similarity score is: {similar_score[0]*100}\n")
+            
+            # scaled_difference = standard_rescale(np.array(weights_post[index])) - standard_rescale(np.array(weight))
+            # pre, post = fig.subplots(1, 2)
+            # fig.tight_layout()
+            # pre_im = pre.imshow(weight)
+            # fig.colorbar(pre_im, ax=pre)
+            # pre.set_title(f"Heatmap Layer {index} Pre")
+            # post_im = post.imshow(weights_post[index])
+            # fig.colorbar(post_im, ax=post)
+            # post.set_title(f"Heatmap Layer {index} Post")
+            # fig.suptitle(f"{logs.model_str} Weight Heatmap")
+            # fig_num += 1
+            # fig = plt.figure(fig_num)
+            # plt.title(f"Layer {index} scaled difference heatmap")
+            # plt.imshow(scaled_difference)
+            # plt.colorbar()
+            # fig_num += 1
+        if os.path.exists(log_path):
+            with open(log_path, 'a') as file:
+                file.write(logs.__str__() + "\n")
+                file.write(f"Average Similarity score: {np.mean(temp_similarities)}\n\n\n")
+        else:
+            with open(log_path, 'w') as file:
+                file.write(logs.__str__() + "\n")
+                file.write(f"Average Similarity score: {np.mean(temp_similarities)}\n\n\n")  
+        print(logs)
+        print(f"Average Similarity score: {np.mean(temp_similarities)}")
+        print("\n")  
