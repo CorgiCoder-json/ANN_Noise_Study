@@ -54,6 +54,7 @@ def chunk_to_obj(chunk_list: list[list[list[str]]]) -> list[SimilarityObject]:
                 temp_dict["epo"] = int(chunk_row[-1])
             elif chunk_row[0] == "Learning":
                 temp_dict["lr"] = float(chunk_row[-1])
+        temp_dict["sim_layers"].pop()
         reports.append(SimilarityObject(temp_dict["sim_layers"], temp_dict["mod_str"], temp_dict["optim"], temp_dict["loss"], temp_dict["lr"], temp_dict["epo"], temp_dict["fin_loss"]))
     return reports
 
@@ -96,7 +97,17 @@ if __name__ == "__main__":
     asgd_scores= acc_sim_plot_data[acc_sim_plot_data["optim"] == 2]
     rms_scores = acc_sim_plot_data[acc_sim_plot_data["optim"] == 1]
     adam_scores = acc_sim_plot_data[acc_sim_plot_data["optim"] == 0]
+    print(f"SGD mean: {sgd_scores['avg_score'].mean()}")
+    print(f"ASGD mean: {asgd_scores['avg_score'].mean()}")
+    print(f"RMSprop mean: {rms_scores['avg_score'].mean()}")
+    print(f"Adam mean: {adam_scores['avg_score'].mean()}")
     fig, axes = plt.subplots(2, 2)
+    fig.subplots_adjust(hspace=0.3)
+    fig.suptitle('Average Similarity Score Distribution for Various Optimizers')
+    axes[0, 0].set_title('SGD Optimizer')
+    axes[0, 1].set_title('ASGD Optimizer')
+    axes[1, 0].set_title('RMSprop Optimizer')
+    axes[1, 1].set_title('Adam Optimizer')
     sns.histplot(sgd_scores, x="avg_score", ax=axes[0, 0])
     sns.histplot(asgd_scores, x="avg_score", ax=axes[0, 1])
     sns.histplot(rms_scores, x="avg_score", ax=axes[1, 0])
